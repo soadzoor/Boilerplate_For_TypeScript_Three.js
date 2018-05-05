@@ -1,4 +1,4 @@
-///<reference path='./scene/Scene.ts'/>
+///<reference path='./view/Scene.ts'/>
 ///<reference path='./model/Model.ts'/>
 
 class Main
