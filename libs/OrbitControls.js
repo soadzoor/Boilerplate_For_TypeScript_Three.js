@@ -17,7 +17,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.object = object;
 
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+	this.domElement = ( domElement !== undefined ) ? domElement : document.getElementById("playground");
 
 	// Set to false to disable this control
 	this.enabled = true;
@@ -96,14 +96,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	this.saveState = function () {
-
-		scope.target0.copy( scope.target );
-		scope.position0.copy( scope.object.position );
-		scope.zoom0 = scope.object.zoom;
-
-	};
-
 	this.reset = function () {
 
 		scope.target.copy( scope.target0 );
@@ -116,6 +108,39 @@ THREE.OrbitControls = function ( object, domElement ) {
 		scope.update();
 
 		state = STATE.NONE;
+
+	};
+
+	var lookAt = {x: 0, y: 0, z: 0};
+	this.setTarget = function (x, y, z) {
+		lookAt.x = x;
+		lookAt.y = y;
+		lookAt.z = z;
+	}
+
+	var goalPosition = {x: this.object.position.x, y: this.object.position.y, z: this.object.position.z};
+	var positionIsModified = false;
+	this.setPosition = function (x, y, z) {
+		goalPosition.x = x;
+		goalPosition.y = y;
+		goalPosition.z = z;
+
+		positionIsModified = true;
+	}
+
+	// smooth Zoom
+	var zoomEnd = 0;
+	this.zoomStart = 0;
+
+	this.zoomDampingFactor = 0.2;
+	this.smoothZoomSpeed = 5.0;
+	this.smoothZoom = true;
+
+	this.smoothZoomUpdate = function () {
+		var factor = 1.0 + ( zoomEnd - this.zoomStart ) * this.smoothZoomSpeed;
+		scale *= factor;
+
+		this.zoomStart += ( zoomEnd - this.zoomStart ) * this.zoomDampingFactor;
 
 	};
 
@@ -176,20 +201,57 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			position.copy( scope.target ).add( offset );
 
-			scope.object.lookAt( scope.target );
+			if ( scope.enableDamping ) {
 
-			if ( scope.enableDamping === true ) {
+				sphericalDelta.theta *= (1 - scope.dampingFactor);
+				sphericalDelta.phi   *= (1 - scope.dampingFactor);
 
-				sphericalDelta.theta *= ( 1 - scope.dampingFactor );
-				sphericalDelta.phi *= ( 1 - scope.dampingFactor );
+				// the few lines below are written by myself based on mueller's 3d tool
+				var goalPositionIsAchieved = positionIsModified && !(scope.object.position.x !== goalPosition.x || scope.object.position.y !== goalPosition.y || scope.object.position.z !== goalPosition.z);
+				if (scope.target.x !== lookAt.x || scope.target.y !== lookAt.y || scope.target.z !== lookAt.z // lookAt is what we're going to look at. target is what we're looking at right now
+				    || !goalPositionIsAchieved) // goalPosition is where the camera is going to be. scope.object.position is the current position of the camera
+				{
+					var targetDist = {x: lookAt.x - scope.target.x, y: lookAt.y - scope.target.y, z: lookAt.z - scope.target.z};
+					if (Math.abs(targetDist.x) < EPS && Math.abs(targetDist.y) < EPS && Math.abs(targetDist.z) < EPS) {
+						scope.target.x = lookAt.x;
+						scope.target.y = lookAt.y;
+						scope.target.z = lookAt.z;
+					}
+					else
+					{
+						scope.target.x += targetDist.x * scope.dampingFactor;
+						scope.target.y += targetDist.y * scope.dampingFactor;
+						scope.target.z += targetDist.z * scope.dampingFactor;
+					}
 
+					if (positionIsModified) {
+						var targetPos = {x: goalPosition.x - scope.object.position.x, y: goalPosition.y - scope.object.position.y, z: goalPosition.z - scope.object.position.z};
+						if (Math.abs(targetPos.x) < EPS && Math.abs(targetPos.y) < EPS && Math.abs(targetPos.z) < EPS) {
+							scope.object.position.x = goalPosition.x;
+							scope.object.position.y = goalPosition.y;
+							scope.object.position.z = goalPosition.z;
+							positionIsModified = false;
+						}
+						else {
+							scope.object.position.x += targetPos.x * scope.dampingFactor;
+							scope.object.position.y += targetPos.y * scope.dampingFactor;
+							scope.object.position.z += targetPos.z * scope.dampingFactor;
+						}
+					}
+				}
 			} else {
 
 				sphericalDelta.set( 0, 0, 0 );
 
 			}
 
+			scope.object.lookAt( scope.target );
+
 			scale = 1;
+			if ( scope.smoothZoom ) {
+				this.smoothZoomUpdate();
+			}
+
 			panOffset.set( 0, 0, 0 );
 
 			// update condition is:
@@ -334,7 +396,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-			if ( scope.object.isPerspectiveCamera ) {
+			if ( scope.object instanceof THREE.PerspectiveCamera ) {
 
 				// perspective
 				var position = scope.object.position;
@@ -348,7 +410,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 				panLeft( 2 * deltaX * targetDistance / element.clientHeight, scope.object.matrix );
 				panUp( 2 * deltaY * targetDistance / element.clientHeight, scope.object.matrix );
 
-			} else if ( scope.object.isOrthographicCamera ) {
+			} else if ( scope.object instanceof THREE.OrthographicCamera ) {
 
 				// orthographic
 				panLeft( deltaX * ( scope.object.right - scope.object.left ) / scope.object.zoom / element.clientWidth, scope.object.matrix );
@@ -368,11 +430,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function dollyIn( dollyScale ) {
 
-		if ( scope.object.isPerspectiveCamera ) {
+		if ( scope.object instanceof THREE.PerspectiveCamera ) {
 
 			scale /= dollyScale;
 
-		} else if ( scope.object.isOrthographicCamera ) {
+		} else if ( scope.object instanceof THREE.OrthographicCamera ) {
 
 			scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom * dollyScale ) );
 			scope.object.updateProjectionMatrix();
@@ -389,11 +451,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function dollyOut( dollyScale ) {
 
-		if ( scope.object.isPerspectiveCamera ) {
+		if ( scope.object instanceof THREE.PerspectiveCamera ) {
 
 			scale *= dollyScale;
 
-		} else if ( scope.object.isOrthographicCamera ) {
+		} else if ( scope.object instanceof THREE.OrthographicCamera ) {
 
 			scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom / dollyScale ) );
 			scope.object.updateProjectionMatrix();
@@ -415,7 +477,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	function handleMouseDownRotate( event ) {
 
 		//console.log( 'handleMouseDownRotate' );
-
+		positionIsModified = false;
 		rotateStart.set( event.clientX, event.clientY );
 
 	}
@@ -458,7 +520,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	function handleMouseMoveDolly( event ) {
-
+		positionIsModified = false;
 		//console.log( 'handleMouseMoveDolly' );
 
 		dollyEnd.set( event.clientX, event.clientY );
@@ -505,17 +567,34 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleMouseWheel( event ) {
 
+		positionIsModified = false;
 		// console.log( 'handleMouseWheel' );
 
-		if ( event.deltaY < 0 ) {
+		if (scope.smoothZoom) {
+			var delta = 0;
 
-			dollyOut( getZoomScale() );
+			if (event.wheelDelta) { // WebKit / Opera / Explorer 9
 
-		} else if ( event.deltaY > 0 ) {
+				delta = event.wheelDelta / 40;
 
-			dollyIn( getZoomScale() );
+			} else if (event.detail) { // Firefox
 
+				delta = -event.detail / 3;
+
+			}
+			scope.zoomStart += delta * 0.001;
+		} else {
+			if ( event.deltaY < 0 ) {
+
+				dollyOut( getZoomScale() );
+
+			} else if ( event.deltaY > 0 ) {
+
+				dollyIn( getZoomScale() );
+
+			}
 		}
+
 
 		scope.update();
 
@@ -552,7 +631,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	function handleTouchStartRotate( event ) {
-
+		positionIsModified = false;
 		//console.log( 'handleTouchStartRotate' );
 
 		rotateStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
@@ -560,7 +639,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	function handleTouchStartDolly( event ) {
-
+		positionIsModified = false;
 		//console.log( 'handleTouchStartDolly' );
 
 		var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
@@ -614,16 +693,19 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		dollyDelta.subVectors( dollyEnd, dollyStart );
 
-		if ( dollyDelta.y > 0 ) {
 
-			dollyOut( getZoomScale() );
+		if (scope.smoothZoom) {
+			var delta = 0;
+			delta = dollyDelta.y / 10;
+			scope.zoomStart += delta * 0.001;
+		} else {
+			if ( dollyDelta.y > 0 ) {
 
-		} else if ( dollyDelta.y < 0 ) {
-
-			dollyIn( getZoomScale() );
-
+				dollyOut(getZoomScale());
+			} else {
+				dollyIn(getZoomScale());
+			}
 		}
-
 		dollyStart.copy( dollyEnd );
 
 		scope.update();
@@ -662,37 +744,29 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
-		switch ( event.button ) {
+		if ( event.button === scope.mouseButtons.ORBIT ) {
 
-			case scope.mouseButtons.ORBIT:
+			if ( scope.enableRotate === false ) return;
 
-				if ( scope.enableRotate === false ) return;
+			handleMouseDownRotate( event );
 
-				handleMouseDownRotate( event );
+			state = STATE.ROTATE;
 
-				state = STATE.ROTATE;
+		} else if ( event.button === scope.mouseButtons.ZOOM ) {
 
-				break;
+			if ( scope.enableZoom === false ) return;
 
-			case scope.mouseButtons.ZOOM:
+			handleMouseDownDolly( event );
 
-				if ( scope.enableZoom === false ) return;
+			state = STATE.DOLLY;
 
-				handleMouseDownDolly( event );
+		} else if ( event.button === scope.mouseButtons.PAN ) {
 
-				state = STATE.DOLLY;
+			if ( scope.enablePan === false ) return;
 
-				break;
+			handleMouseDownPan( event );
 
-			case scope.mouseButtons.PAN:
-
-				if ( scope.enablePan === false ) return;
-
-				handleMouseDownPan( event );
-
-				state = STATE.PAN;
-
-				break;
+			state = STATE.PAN;
 
 		}
 
@@ -713,31 +787,23 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
-		switch ( state ) {
+		if ( state === STATE.ROTATE ) {
 
-			case STATE.ROTATE:
+			if ( scope.enableRotate === false ) return;
 
-				if ( scope.enableRotate === false ) return;
+			handleMouseMoveRotate( event );
 
-				handleMouseMoveRotate( event );
+		} else if ( state === STATE.DOLLY ) {
 
-				break;
+			if ( scope.enableZoom === false ) return;
 
-			case STATE.DOLLY:
+			handleMouseMoveDolly( event );
 
-				if ( scope.enableZoom === false ) return;
+		} else if ( state === STATE.PAN ) {
 
-				handleMouseMoveDolly( event );
+			if ( scope.enablePan === false ) return;
 
-				break;
-
-			case STATE.PAN:
-
-				if ( scope.enablePan === false ) return;
-
-				handleMouseMovePan( event );
-
-				break;
+			handleMouseMovePan( event );
 
 		}
 
@@ -765,10 +831,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		scope.dispatchEvent( startEvent );
-
 		handleMouseWheel( event );
 
+		scope.dispatchEvent( startEvent ); // not sure why these are here...
 		scope.dispatchEvent( endEvent );
 
 	}
@@ -889,9 +954,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onContextMenu( event ) {
 
-		if ( scope.enabled === false ) return;
-
-		event.preventDefault();
+		//event.preventDefault();
 
 	}
 

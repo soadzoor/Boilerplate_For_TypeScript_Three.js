@@ -35,7 +35,7 @@ class Scene
 
 	private initControls()
 	{
-		this._controls = new THREE.OrbitControls(this._camera);
+		this._controls = new THREE.OrbitControls(this._camera, this._canvas);
 		this._controls.enablePan = false;
 		this._controls.enableZoom = true;
 		this._controls.enableDamping = true;
