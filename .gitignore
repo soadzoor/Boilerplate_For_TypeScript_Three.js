@@ -1,6 +1,3 @@
 .idea/
-build/prod/
+build/
 node_modules/
-!node_modules/@types/three/index.d.ts
-!node_modules/@types/three/three-gltfloader.d.ts
-!node_modules/@types/three/three-dracoloader.d.ts
