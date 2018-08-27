@@ -71,7 +71,7 @@ class Scene
 
 		this._renderer.context.canvas.addEventListener('webglcontextlost', this.onContextLost);
 
-		window.addEventListener('resize', this.onWindowResize, false);
+		window.addEventListener('resize', this.onWindowResize);
 	}
 
 	private onWindowResize = () =>
