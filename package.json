@@ -1,23 +1,22 @@
 {
-  "name": "template",
+  "name": "Title",
+  "description": "Title",
   "version": "0.0.1",
-  "devDependencies": {
-    "@types/three": "^0.92.8",
-    "awesome-typescript-loader": "^5.2.0",
-    "clean-webpack-plugin": "^0.1.19",
-    "css-loader": "^0.28.11",
-    "extract-text-webpack-plugin": "^3.0.2",
-    "file-loader": "^1.1.11",
-    "html-webpack-plugin": "^3.2.0",
-    "style-loader": "^0.21.0",
-    "three": "^0.93.0",
-    "typescript": "^2.9.2",
-    "uglifyjs-webpack-plugin": "^1.2.7",
-    "webpack": "^4.12.1",
-    "webpack-cli": "^3.0.8"
-  },
   "scripts": {
-    "build: prod": "webpack --config webpack.config.js --mode production",
-    "build: dev": "webpack --config webpack.config.js --mode development"
-  }
+    "build dev": "node build/build dev",
+    "build prod": "node build/build prod"
+  },
+  "author": "Peter Varga",
+  "dependencies": {
+    "@types/three": "^0.92.18",
+    "@types/tween.js": "^16.9.0",
+    "concat": "^1.0.3",
+    "fs": "0.0.2",
+    "fs-extra": "^0.24.0",
+    "shelljs": "^0.6.0",
+    "typescript": "^2.9.2",
+    "uglify-es": "^3.3.9"
+  },
+  "repository": "",
+  "license": ""
 }

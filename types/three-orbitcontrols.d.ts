@@ -1,17 +1,17 @@
-import { Camera, MOUSE, Object3D, Vector3 } from "./three-core";
+///<reference path='../node_modules/@types/three/three-core'/>
 
-export class OrbitControls {
-    constructor(object: Camera, domElement?: HTMLElement);
+declare class OrbitControls {
+    constructor(object: THREE.Camera, domElement?: HTMLElement);
 
-    object: Camera;
+    object: THREE.Camera;
     domElement: HTMLElement | HTMLDocument;
 
     // API
     enabled: boolean;
-    target: Vector3;
+    target: THREE.Vector3;
 
     // deprecated
-    center: Vector3;
+    center: THREE.Vector3;
 
     enableZoom: boolean;
     zoomSpeed: number;
@@ -29,10 +29,16 @@ export class OrbitControls {
     maxAzimuthAngle: number;
     enableKeys: boolean;
     keys: {LEFT: number; UP: number; RIGHT: number; BOTTOM: number;};
-    mouseButtons: {ORBIT: MOUSE; ZOOM: MOUSE; PAN: MOUSE;};
+    mouseButtons: {ORBIT: THREE.MOUSE; ZOOM: THREE.MOUSE; PAN: THREE.MOUSE;};
     enableDamping: boolean;
     dampingFactor: number;
+	smoothZoom: boolean;
+	zoomDampingFactor: number;
+	smoothZoomSpeed: number;
 
+    setPosition(x: number, y: number, z: number): void;
+
+    setTarget(x: number, y: number, z: number): void;
 
     rotateLeft(angle?: number): void;
 

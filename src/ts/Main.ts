@@ -1,15 +1,34 @@
-import '../css/style.css';
-// import * as THREE from 'three';
+///<reference path='./view/Scene.ts'/>
+///<reference path='./model/Model.ts'/>
 
-import {C} from './model/C';
-
-export class Main
+class Main
 {
+	public static instance: Main;
+	public static getInstance(): Main
+	{
+		return Main.instance || new Main();
+	}
+
+	private _model: Model;
+	private _scene: Scene;
+
 	constructor()
 	{
-		const c = new C();
-		c.calculateX();
+		Main.instance = this;
+
+		this._model = new Model();
+		this._scene = new Scene();
+	}
+
+	public get scene(): Scene
+	{
+		return this._scene;
+	}
+
+	public get model(): Model
+	{
+		return this._model;
 	}
 }
 
-const main = new Main();
+const main = Main.getInstance();
