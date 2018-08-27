@@ -45,11 +45,14 @@ function build(pArg0) {
 				'./libs/DRACOLoader.js',
 				'./libs/OrbitControls.js',
 				BUILD_PROD + '/js/app.js'
-			].join(' ');
+			];
 
-			bt.exec_module("concat -o " + BUILD_PROD + "/js/app.js " + arrayOfJsFiles);
+			bt.exec_module("concat -o " + BUILD_PROD + "/js/app.js " + arrayOfJsFiles.join(' '));
 
-			bt.rm(BUILD_PROD + "/libs");
+			for (var i = 0; i < arrayOfJsFiles.length - 1; ++i)
+			{
+				bt.rm(BUILD_PROD + arrayOfJsFiles[i].substr(1));
+			}
 
 			/** --mangle-props reserved=[THREE,WEBVR] --> breaks code! */
 			bt.exec_module("uglifyjs", BUILD_PROD + "/js/app.js" + " --compress --mangle toplevel --output " + BUILD_PROD + "/js/app.js");
