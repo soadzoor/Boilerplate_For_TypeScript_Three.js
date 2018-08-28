@@ -38,14 +38,22 @@ function build(pArg0) {
 		case 'prod':
 			build_all();
 
-			var arrayOfJsFiles = [
-				'./libs/Tween.js',
-				'./libs/three.js',
-				'./libs/GLTFLoader.js',
-				'./libs/DRACOLoader.js',
-				'./libs/OrbitControls.js',
-				BUILD_PROD + '/js/app.js'
-			];
+			var arrayOfJsFiles = [];
+
+			var indexContent = require('fs').readFileSync(BUILD_PROD + '/index.html', 'utf-8');
+			var lines = indexContent.split('\n');
+			for (var i = 0; i < lines.length; ++i)
+			{
+				var line = lines[i];
+				if (line.indexOf('<script src="libs') !== -1)
+				{
+					var libFile = line.split('"')[1];
+					console.log(libFile);
+					arrayOfJsFiles.push(libFile);
+				}
+			}
+			arrayOfJsFiles.push(BUILD_PROD + '/js/app.js');
+
 
 			bt.exec_module("concat -o " + BUILD_PROD + "/js/app.js " + arrayOfJsFiles.join(' '));
 
@@ -57,20 +65,15 @@ function build(pArg0) {
 			/** --mangle-props reserved=[THREE,WEBVR] --> breaks code! */
 			bt.exec_module("uglifyjs", BUILD_PROD + "/js/app.js" + " --compress --mangle toplevel --output " + BUILD_PROD + "/js/app.js");
 
-			fs.readFile(BUILD_PROD + '/index.html', "utf8", function read(err, data) {
+
+			var newIndexContent = indexContent.replace(/^.*<script src="libs\/.*$/mg, "");
+
+			bt.rm(BUILD_PROD + '/index.html');
+
+			fs.writeFile(BUILD_PROD + '/index.html', newIndexContent, function (err) {
 				if (err) {
 					throw err;
 				}
-
-				var content = data.replace(/^.*<script src="libs\/.*$/mg, "");
-
-				bt.rm(BUILD_PROD + '/index.html');
-
-				fs.writeFile(BUILD_PROD + '/index.html', content, function (err) {
-					if (err) {
-						throw err;
-					}
-				});
 			});
 
 			break;
