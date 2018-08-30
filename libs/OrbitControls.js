@@ -566,23 +566,12 @@ OrbitControls = function ( object, domElement ) {
 	}
 
 	function handleMouseWheel( event ) {
-
 		positionIsModified = false;
 		// console.log( 'handleMouseWheel' );
 
 		if (scope.smoothZoom) {
-			var delta = 0;
-
-			if (event.wheelDelta) { // WebKit / Opera / Explorer 9
-
-				delta = event.wheelDelta / 40;
-
-			} else if (event.detail) { // Firefox
-
-				delta = -event.detail / 3;
-
-			}
-			scope.zoomStart += delta * 0.001;
+			var delta = -Math.sign(event.deltaY) * 5;
+			scope.zoomStart = delta * 0.001;
 		} else {
 			if ( event.deltaY < 0 ) {
 
@@ -595,9 +584,7 @@ OrbitControls = function ( object, domElement ) {
 			}
 		}
 
-
 		scope.update();
-
 	}
 
 	function handleKeyDown( event ) {
