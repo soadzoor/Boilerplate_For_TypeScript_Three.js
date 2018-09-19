@@ -13,7 +13,7 @@ class Scene
 	{
 		this._canvas = <HTMLCanvasElement>document.getElementById('myCanvas');
 		this._scene = new THREE.Scene();
-		this._camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.05, 70);
+		this._camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.05, 700);
 		this._camera.position.set(5, 10, 20);
 
 		this.initLights();
@@ -50,8 +50,25 @@ class Scene
 
 		this._scene.add(boxMesh);
 
-		const gridHelper = new THREE.GridHelper(10, 10);
-		this._scene.add( gridHelper );
+		const gridHelper = new THREE.GridHelper(10, 10, new THREE.Color(0xFF0000), new THREE.Color(0x00FF00));
+		this._scene.add(gridHelper);
+
+		this._scene.add(this.initSkyBox('assets/textures/equirectangular/environment.jpg'));
+	}
+
+	private initSkyBox(url: string)
+	{
+		const geometry = new THREE.SphereBufferGeometry(50, 60, 40);
+
+		const material = new THREE.MeshBasicMaterial({
+			map: new THREE.TextureLoader().load(url),
+			side: THREE.BackSide,
+			depthWrite: false
+		});
+
+		const mesh = new THREE.Mesh(geometry, material);
+
+		return mesh;
 	}
 
 	private initRenderer()
