@@ -33,3 +33,15 @@ main {
 canvas {
 	touch-action: none;
 }
+
+canvas.rotatable {
+	cursor: grab;
+	cursor: -moz-grab;
+	cursor: -webkit-grab;
+}
+
+canvas.rotating {
+	cursor: grabbing;
+	cursor: -moz-grabbing;
+	cursor: -webkit-grabbing;
+}

@@ -1,3 +1,5 @@
+///<reference path='./Convergence'/>
+
 class BoundedConvergence extends Convergence
 {
 	private _min: number;

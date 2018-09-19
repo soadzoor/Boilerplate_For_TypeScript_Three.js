@@ -1,11 +1,12 @@
 ///<reference path='../../../types/three-orbitcontrols'/>
+///<reference path='./LookAroundControls'/>
 
 class Scene
 {
 	private _canvas: HTMLCanvasElement;
 	private _scene: THREE.Scene;
 	private _camera: THREE.PerspectiveCamera;
-	private _controls: OrbitControls;
+	private _controls: LookAroundControls;
 	private _renderer: THREE.WebGLRenderer;
 
 	constructor()
@@ -37,18 +38,8 @@ class Scene
 
 	private initControls()
 	{
-		this._controls = new OrbitControls(this._camera, this._canvas);
-		this._controls.enablePan = false;
-		this._controls.enableZoom = true;
-		this._controls.enableDamping = true;
-		this._controls.minDistance = this._camera.near*5;
-		this._controls.maxDistance = this._camera.far*0.75;
-
-		this._controls.dampingFactor = 0.07;
-		this._controls.rotateSpeed = 0.2;
-		this._controls.smoothZoom = true;
-		this._controls.zoomDampingFactor = this._controls.dampingFactor;
-		this._controls.smoothZoomSpeed = 5.0;
+		this._controls = new LookAroundControls(this._camera, this._canvas);
+		this._controls.activate();
 	}
 
 	private initMeshes()
@@ -56,7 +47,11 @@ class Scene
 		const boxGeometry = new THREE.BoxBufferGeometry(5, 5, 5);
 		const boxMaterial = new THREE.MeshStandardMaterial({color: 0x00AABB});
 		const boxMesh     = new THREE.Mesh(boxGeometry, boxMaterial);
+
 		this._scene.add(boxMesh);
+
+		const gridHelper = new THREE.GridHelper(10, 10);
+		this._scene.add( gridHelper );
 	}
 
 	private initRenderer()
