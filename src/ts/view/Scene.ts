@@ -1,12 +1,11 @@
-///<reference path='../../../types/three-orbitcontrols'/>
-///<reference path='./LookAroundControls'/>
+///<reference path='./OrbitControls.ts'/>
 
 class Scene
 {
 	private _canvas: HTMLCanvasElement;
 	private _scene: THREE.Scene;
 	private _camera: THREE.PerspectiveCamera;
-	private _controls: LookAroundControls;
+	private _controls: OrbitControls;
 	private _renderer: THREE.WebGLRenderer;
 
 	constructor()
@@ -38,7 +37,8 @@ class Scene
 
 	private initControls()
 	{
-		this._controls = new LookAroundControls(this._camera, this._canvas);
+		this._controls = new OrbitControls(this._camera, this._canvas);
+		this._controls
 		this._controls.activate();
 	}
 

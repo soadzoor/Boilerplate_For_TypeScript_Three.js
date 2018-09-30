@@ -1,4 +1,4 @@
-///<reference path='./Convergence'/>
+///<reference path='./Convergence.ts'/>
 
 class BoundedConvergence extends Convergence
 {
