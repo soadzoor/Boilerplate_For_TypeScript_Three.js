@@ -1,4 +1,5 @@
-///<reference path='../../../types/three-orbitcontrols'/>
+///<reference path='./OrbitControls.ts'/>
+///<reference path='./SceneLoader.ts'/>
 
 class Scene
 {
@@ -7,6 +8,7 @@ class Scene
 	private _camera: THREE.PerspectiveCamera;
 	private _controls: OrbitControls;
 	private _renderer: THREE.WebGLRenderer;
+	private _sceneLoader: SceneLoader;
 
 	constructor()
 	{
@@ -38,25 +40,12 @@ class Scene
 	private initControls()
 	{
 		this._controls = new OrbitControls(this._camera, this._canvas);
-		this._controls.enablePan = false;
-		this._controls.enableZoom = true;
-		this._controls.enableDamping = true;
-		this._controls.minDistance = this._camera.near*5;
-		this._controls.maxDistance = this._camera.far*0.75;
-
-		this._controls.dampingFactor = 0.07;
-		this._controls.rotateSpeed = 0.2;
-		this._controls.smoothZoom = true;
-		this._controls.zoomDampingFactor = this._controls.dampingFactor;
-		this._controls.smoothZoomSpeed = 5.0;
+		this._controls.activate();
 	}
 
 	private initMeshes()
 	{
-		const boxGeometry = new THREE.BoxBufferGeometry(5, 5, 5);
-		const boxMaterial = new THREE.MeshStandardMaterial({color: 0x00AABB});
-		const boxMesh     = new THREE.Mesh(boxGeometry, boxMaterial);
-		this._scene.add(boxMesh);
+		this._sceneLoader = new SceneLoader(this, `assets/models/test.glb`);
 	}
 
 	private initRenderer()
@@ -93,6 +82,11 @@ class Scene
 
 		alert('Unfortunately WebGL has crashed. Please reload the page to continue!');
 	};
+
+	public get scene()
+	{
+		return this._scene;
+	}
 
 	private update = (time: number) =>
 	{

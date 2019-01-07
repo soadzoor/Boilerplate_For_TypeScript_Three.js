@@ -1,3 +1,5 @@
+///<reference path='../utils/Convergence.ts'/>
+
 class BoundedConvergence extends Convergence
 {
 	private _min: number;
