@@ -8,7 +8,7 @@
   },
   "author": "Peter Varga",
   "dependencies": {
-    "@types/three": "^0.92.18",
+    "@types/three": "^0.93.20",
     "@types/tween.js": "^16.9.0",
     "concat": "^1.0.3",
     "fs": "0.0.2",

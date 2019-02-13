@@ -36,7 +36,7 @@ function build(pArg0) {
 			break;
 
 		case 'prod':
-			build_all();
+			build_all(true);
 
 			var arrayOfJsFiles = [];
 
@@ -83,7 +83,7 @@ function build(pArg0) {
 	}
 }
 
-function build_all() {
+function build_all(isProd) {
 
 	// clean prod dir
 	bt.clean_dir(BUILD_PROD);
@@ -91,7 +91,12 @@ function build_all() {
 	// copy tiff.min.js and index.html
 	bt.cp(LOCAL_ROOT + "/src/index.html", BUILD_PROD + "/index.html");
 	bt.cp(LOCAL_ROOT + "/src/css/style.css", BUILD_PROD + "/css/style.css");
-	bt.cp(LOCAL_ROOT + "/libs", BUILD_PROD + "/libs");
+
+	if (isProd) {
+		bt.cp(LOCAL_ROOT + "/libs/draco", BUILD_PROD + "/libs/draco");
+	} else {
+		bt.cp(LOCAL_ROOT + "/libs", BUILD_PROD + "/libs");
+	}
 
 	ts();
 
