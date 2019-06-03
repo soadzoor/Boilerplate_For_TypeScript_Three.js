@@ -1,15 +1,14 @@
-///<reference path='../../../types/three-gltfloader.d.ts'/>
-///<reference path='../../../types/three-dracoloader.d.ts'/>
-///<reference path='./Scene.ts'/>
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { SceneManager } from './SceneManager';
 
-class SceneLoader
+export class SceneLoader
 {
-	private _scene: Scene;
+	private _sceneManager: SceneManager;
 	private _url: string;
 	
-	constructor(scene: Scene, url: string)
+	constructor(scene: SceneManager, url: string)
 	{
-		this._scene = scene;
+		this._sceneManager = scene;
 		this._url = url;
 
 		this.loadScene(this._url);
@@ -17,9 +16,7 @@ class SceneLoader
 
 	private loadScene = (url: string) =>
 	{
-		DRACOLoader.setDecoderPath('libs/draco/gltf/');
 		const gltfLoader = new GLTFLoader();
-		gltfLoader.setDRACOLoader(new DRACOLoader());
 
 		gltfLoader.load(url, (gltf: any) =>
 		{
@@ -30,6 +27,6 @@ class SceneLoader
 	private onLoad = (gltf: any) =>
 	{
 		const object = gltf.scene;
-		this._scene.scene.add(object);
+		this._sceneManager.scene.add(object);
 	};
 }

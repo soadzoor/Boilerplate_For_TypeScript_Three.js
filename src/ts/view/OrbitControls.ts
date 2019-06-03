@@ -1,6 +1,9 @@
-///<reference path='../utils/BoundedConvergence.ts'/>
+import { EventDispatcher, MOUSE, Quaternion, Vector3, Spherical, PerspectiveCamera, Vector2, Math as THREEMath } from 'three';
+import { BoundedConvergence } from 'utils/BoundedConvergence';
 
-/** OrbitControls based on three.js' OrbitControls, extended with zoomdamping, dynamic targeting and positionchanging. Original authors:
+const TWEEN = require('tween.js');
+
+/** OrbitControls based on js' OrbitControls, extended with zoomdamping, dynamic targeting and positionchanging. Original authors:
  *
  * @author qiao / https://github.com/qiao
  * @author mrdoob / http://mrdoob.com
@@ -25,19 +28,19 @@ interface OrbitControlsConfig
 	maxDistance: number;
 }
 
-class OrbitControls extends THREE.EventDispatcher
+export class OrbitControls extends EventDispatcher
 {
-	private _camera: THREE.PerspectiveCamera;
-	private _canvas: HTMLCanvasElement;
-	private _target: THREE.Vector3;
+	private _camera: PerspectiveCamera;
+	private _domElement: HTMLElement;
+	private _target: Vector3;
 	private _distance: BoundedConvergence;
 	private _polarAngle: BoundedConvergence;
 	private _azimuthAngle: BoundedConvergence;
-	private _spherical: THREE.Spherical;
+	private _spherical: Spherical;
 
-	private _offset: THREE.Vector3;
-	private _quat: THREE.Quaternion;
-	private _quatInverse: THREE.Quaternion;
+	private _offset: Vector3;
+	private _quat: Quaternion;
+	private _quatInverse: Quaternion;
 
 	private _pointer: {x: number, y: number, prevX: number, prevY: number, isDown: boolean};
 	private _pinchDistance: {current: number, previous: number};
@@ -45,19 +48,19 @@ class OrbitControls extends THREE.EventDispatcher
 	private _config: OrbitControlsConfig;
 
 	// Mouse buttons
-	private _mouseButtons = {LEFT: THREE.MOUSE.LEFT, MIDDLE: THREE.MOUSE.MIDDLE, RIGHT: THREE.MOUSE.RIGHT};
+	private _mouseButtons = {LEFT: MOUSE.LEFT, MIDDLE: MOUSE.MIDDLE, RIGHT: MOUSE.RIGHT};
 
-	constructor(camera: THREE.PerspectiveCamera, canvas: HTMLCanvasElement, config?: OrbitControlsConfig)
+	constructor(camera: PerspectiveCamera, domElement: HTMLElement, config?: OrbitControlsConfig)
 	{
 		super();
 		this._camera = camera;
-		this._canvas = canvas;
-		this._target = new THREE.Vector3();
-		this._quat = new THREE.Quaternion().setFromUnitVectors(this._camera.up, new THREE.Vector3(0, 1, 0));
+		this._domElement = domElement;
+		this._target = new Vector3();
+		this._quat = new Quaternion().setFromUnitVectors(this._camera.up, new Vector3(0, 1, 0));
 		this._quatInverse = this._quat.clone().inverse();
-		this._spherical = new THREE.Spherical();
+		this._spherical = new Spherical();
 
-		this._offset = new THREE.Vector3();
+		this._offset = new Vector3();
 		this._offset.copy(this._camera.position).sub(this._target);
 		this._offset.applyQuaternion(this._quat);
 		this._spherical.setFromVector3(this._offset);
@@ -92,31 +95,31 @@ class OrbitControls extends THREE.EventDispatcher
 	public activate()
 	{
 		this._config.enabled = true;
-		this._canvas.addEventListener( 'mousedown',  this.onMouseDown);
-		this._canvas.addEventListener( 'mousemove',  this.onMouseMove);
-		this._canvas.addEventListener( 'mouseup',    this.onPointerUp);
-		this._canvas.addEventListener( 'mouseleave', this.onPointerUp);
-		this._canvas.addEventListener( 'wheel',      this.onMouseWheel);
+		this._domElement.addEventListener( 'mousedown',  this.onMouseDown);
+		this._domElement.addEventListener( 'mousemove',  this.onMouseMove);
+		this._domElement.addEventListener( 'mouseup',    this.onPointerUp);
+		this._domElement.addEventListener( 'mouseleave', this.onPointerUp);
+		this._domElement.addEventListener( 'wheel',      this.onMouseWheel);
 
-		this._canvas.addEventListener( 'touchstart', this.onTouchStart);
-		this._canvas.addEventListener( 'touchend',   this.onPointerUp);
-		this._canvas.addEventListener( 'touchcancel',this.onPointerUp);
-		this._canvas.addEventListener( 'touchmove',  this.onTouchMove);
+		this._domElement.addEventListener( 'touchstart', this.onTouchStart);
+		this._domElement.addEventListener( 'touchend',   this.onPointerUp);
+		this._domElement.addEventListener( 'touchcancel',this.onPointerUp);
+		this._domElement.addEventListener( 'touchmove',  this.onTouchMove);
 	}
 
 	public deactivate()
 	{
 		this._config.enabled = false;
-		this._canvas.removeEventListener( 'mousedown',  this.onMouseDown);
-		this._canvas.removeEventListener( 'mousemove',  this.onMouseMove);
-		this._canvas.removeEventListener( 'mouseup',    this.onPointerUp);
-		this._canvas.removeEventListener( 'mouseleave', this.onPointerUp);
-		this._canvas.removeEventListener( 'wheel',      this.onMouseWheel);
+		this._domElement.removeEventListener( 'mousedown',  this.onMouseDown);
+		this._domElement.removeEventListener( 'mousemove',  this.onMouseMove);
+		this._domElement.removeEventListener( 'mouseup',    this.onPointerUp);
+		this._domElement.removeEventListener( 'mouseleave', this.onPointerUp);
+		this._domElement.removeEventListener( 'wheel',      this.onMouseWheel);
 
-		this._canvas.removeEventListener( 'touchstart', this.onTouchStart);
-		this._canvas.removeEventListener( 'touchend',   this.onPointerUp);
-		this._canvas.removeEventListener( 'touchcancel',this.onPointerUp);
-		this._canvas.removeEventListener( 'touchmove',  this.onTouchMove);
+		this._domElement.removeEventListener( 'touchstart', this.onTouchStart);
+		this._domElement.removeEventListener( 'touchend',   this.onPointerUp);
+		this._domElement.removeEventListener( 'touchcancel',this.onPointerUp);
+		this._domElement.removeEventListener( 'touchmove',  this.onTouchMove);
 	}
 
 	private onTouchStart = (event: TouchEvent) =>
@@ -129,8 +132,8 @@ class OrbitControls extends THREE.EventDispatcher
 		}
 		else if (event.touches.length === 2)
 		{
-			const vec1 = new THREE.Vector2(event.touches[0].clientX, event.touches[0].clientY);
-			const vec2 = new THREE.Vector2(event.touches[1].clientX, event.touches[1].clientY);
+			const vec1 = new Vector2(event.touches[0].clientX, event.touches[0].clientY);
+			const vec2 = new Vector2(event.touches[1].clientX, event.touches[1].clientY);
 
 			this._pinchDistance.current = vec1.distanceTo(vec2);
 		}
@@ -144,8 +147,8 @@ class OrbitControls extends THREE.EventDispatcher
 		}
 		else if (event.touches.length === 2)
 		{
-			const vec1 = new THREE.Vector2(event.touches[0].clientX, event.touches[0].clientY);
-			const vec2 = new THREE.Vector2(event.touches[1].clientX, event.touches[1].clientY);
+			const vec1 = new Vector2(event.touches[0].clientX, event.touches[0].clientY);
+			const vec2 = new Vector2(event.touches[1].clientX, event.touches[1].clientY);
 
 			this._pinchDistance.current = vec1.distanceTo(vec2);
 
@@ -218,8 +221,8 @@ class OrbitControls extends THREE.EventDispatcher
 		if (this._pointer.prevX !== null && this._pointer.prevY !== null)
 		{
 			this.dispatchEvent({type: 'start'});
-			const deltaX = THREE.Math.degToRad(this._pointer.x - this._pointer.prevX);
-			const deltaY = THREE.Math.degToRad(this._pointer.y - this._pointer.prevY);
+			const deltaX = THREEMath.degToRad(this._pointer.x - this._pointer.prevX);
+			const deltaY = THREEMath.degToRad(this._pointer.y - this._pointer.prevY);
 
 			this._polarAngle.decreaseEndBy(deltaY);
 			this._azimuthAngle.decreaseEndBy(deltaX);
@@ -241,11 +244,11 @@ class OrbitControls extends THREE.EventDispatcher
 
 	public setPosition = (x: number, y: number, z: number, animationDuration: number = 500) =>
 	{
-		const desiredPos = new THREE.Vector3(x, y, z);
-		const offset = new THREE.Vector3().copy(desiredPos).sub(this._target);
+		const desiredPos = new Vector3(x, y, z);
+		const offset = new Vector3().copy(desiredPos).sub(this._target);
 		offset.applyQuaternion(this._quat);
 
-		const spherical = new THREE.Spherical();
+		const spherical = new Spherical();
 		spherical.setFromVector3(offset);
 		spherical.makeSafe();
 
@@ -258,7 +261,7 @@ class OrbitControls extends THREE.EventDispatcher
 
 	public setTarget = (x: number, y: number, z: number, animationDuration: number = 500) =>
 	{
-		this.changePositionSmoothly(this._target, new THREE.Vector3(x, y, z), animationDuration);
+		this.changePositionSmoothly(this._target, new Vector3(x, y, z), animationDuration);
 	};
 
 	public get target()
@@ -272,7 +275,7 @@ class OrbitControls extends THREE.EventDispatcher
 		this._distance.reset(startValue, value, this._distance.min, value*1.2);
 	};
 
-	private changePositionSmoothly = (pos: THREE.Vector3, desiredPos: THREE.Vector3, animationDuration: number) =>
+	private changePositionSmoothly = (pos: Vector3, desiredPos: Vector3, animationDuration: number) =>
 	{
 		const startData = {x: pos.x, y: pos.y, z: pos.z};
 		const endData = {x: desiredPos.x, y: desiredPos.y, z: desiredPos.z};

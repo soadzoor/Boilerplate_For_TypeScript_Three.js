@@ -1,6 +1,6 @@
-///<reference path='../utils/Convergence.ts'/>
+import { Convergence } from './Convergence';
 
-class BoundedConvergence extends Convergence
+export class BoundedConvergence extends Convergence
 {
 	private _min: number;
 	private _max: number;

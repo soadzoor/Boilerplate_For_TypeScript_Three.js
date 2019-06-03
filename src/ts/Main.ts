@@ -1,7 +1,7 @@
-///<reference path='./view/Scene.ts'/>
-///<reference path='./model/Model.ts'/>
+import { SceneManager } from "./view/SceneManager";
+import { Model } from './model/Model';
 
-class Main
+export class Main
 {
 	public static instance: Main;
 	public static getInstance(): Main
@@ -10,22 +10,22 @@ class Main
 	}
 
 	private _model: Model;
-	private _scene: Scene;
+	private _sceneManager: SceneManager;
 
 	constructor()
 	{
 		Main.instance = this;
 
 		this._model = new Model();
-		this._scene = new Scene();
+		this._sceneManager = new SceneManager();
 	}
 
-	public get scene(): Scene
+	public get scene()
 	{
-		return this._scene;
+		return this._sceneManager;
 	}
 
-	public get model(): Model
+	public get model()
 	{
 		return this._model;
 	}

@@ -2,7 +2,7 @@
  *  If you modify the "end", end you keep calling "update", then start will get closer and closer to the value of "end"
  *  The higher the dampingFactor is, the faster the "animation" is. It should be between 0 and 1.*/
 
-class Convergence
+export class Convergence
 {
 	protected _originalStart: number;
 	protected _originalEnd: number;
@@ -52,6 +52,6 @@ class Convergence
 
 	public update = () =>
 	{
-		this._start += (this._end - this._start)*this._dampingFactor
+		this._start += (this._end - this._start) * this._dampingFactor
 	}
 }
