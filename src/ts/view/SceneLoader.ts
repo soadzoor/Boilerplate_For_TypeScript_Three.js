@@ -1,4 +1,4 @@
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import { SceneManager } from './SceneManager';
 
 export class SceneLoader
@@ -17,14 +17,14 @@ export class SceneLoader
 	private loadScene = (url: string) =>
 	{
 		const gltfLoader = new GLTFLoader();
+		
+		//DRACOLoader.setDecoderPath('../decoder/');
+		//gltfLoader.setDRACOLoader(new DRACOLoader());
 
-		gltfLoader.load(url, (gltf: any) =>
-		{
-			this.onLoad(gltf);
-		});
+		gltfLoader.load(url, this.onLoad);
 	};
 
-	private onLoad = (gltf: any) =>
+	private onLoad = (gltf: GLTF) =>
 	{
 		const object = gltf.scene;
 		this._sceneManager.scene.add(object);
