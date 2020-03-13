@@ -1,7 +1,7 @@
-import {Scene, PerspectiveCamera, WebGLRenderer, AmbientLight, DirectionalLight, HemisphereLight} from 'three';
-import { OrbitControls } from './OrbitControls';
-import { SceneLoader } from './SceneLoader';
-import { VignetteBackground } from './VignetteBackground';
+import {Scene, PerspectiveCamera, WebGLRenderer, AmbientLight, DirectionalLight, HemisphereLight} from "three";
+import { OrbitControls } from "./OrbitControls";
+import { SceneLoader } from "./SceneLoader";
+import { VignetteBackground } from "./VignetteBackground";
 
 export class SceneManager
 {
@@ -14,7 +14,7 @@ export class SceneManager
 
 	constructor()
 	{
-		this._canvas = <HTMLCanvasElement>document.getElementById('myCanvas');
+		this._canvas = <HTMLCanvasElement>document.getElementById("myCanvas");
 		this._scene = new Scene();
 		this._camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.05, 70);
 		this._camera.position.set(5, 10, 20);
@@ -35,7 +35,7 @@ export class SceneManager
 		this._scene.add(new VignetteBackground({
 			aspect: this._camera.aspect,
 			grainScale: IS_IOS ? 0 : 0.001, // mattdesl/three-vignette-background#1
-			colors: ['#ffffff', '#353535']
+			colors: ["#ffffff", "#353535"]
 		}).mesh);
 	}
 
@@ -65,11 +65,7 @@ export class SceneManager
 
 	private initRenderer()
 	{
-		let context = this._canvas.getContext('webgl2');
-		if (!context)
-		{
-			context = this._canvas.getContext('experimental-webgl2');
-		}
+		const context = this._canvas.getContext("webgl2") || this._canvas.getContext("experimental-webgl2");
 		this._renderer = new WebGLRenderer({
 			antialias: true,
 			canvas: this._canvas,
@@ -77,11 +73,10 @@ export class SceneManager
 		});
 		this._renderer.setPixelRatio(window.devicePixelRatio);
 		this._renderer.setClearColor(0xECF8FF);
-		this._renderer.gammaOutput = true;
 
-		this._renderer.context.canvas.addEventListener('webglcontextlost', this.onContextLost);
+		this._canvas.addEventListener("webglcontextlost", this.onContextLost);
 
-		window.addEventListener('resize', this.onWindowResize);
+		window.addEventListener("resize", this.onWindowResize);
 	}
 
 	private onWindowResize = () =>
@@ -101,7 +96,7 @@ export class SceneManager
 	{
 		event.preventDefault();
 
-		alert('Unfortunately WebGL has crashed. Please reload the page to continue!');
+		alert("Unfortunately WebGL has crashed. Please reload the page to continue!");
 	};
 
 	public get scene()
