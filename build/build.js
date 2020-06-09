@@ -1,4 +1,3 @@
-
 const LOCAL_ROOT = ".";
 const BUILD_DEV = "build/dev";
 const BUILD_PROD = "build/prod";
