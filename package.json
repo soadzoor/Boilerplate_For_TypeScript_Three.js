@@ -19,11 +19,7 @@
   "dependencies": {
     "@types/node": "^12.0.2",
     "esbuild": "^0.4.12",
-    "fs": "0.0.2",
-    "fs-extra": "^8.0.1",
-    "shelljs": "^0.8.3",
     "shx": "^0.3.2",
-    "source-map-loader": "^0.2.4",
     "three": "^0.117.1",
     "tween.js": "^16.6.0",
     "typescript": "^3.9.5",
