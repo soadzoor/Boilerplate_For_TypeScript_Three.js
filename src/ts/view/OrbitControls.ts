@@ -1,4 +1,4 @@
-import { EventDispatcher, MOUSE, Quaternion, Vector3, Spherical, PerspectiveCamera, Vector2, Math as THREEMath } from 'three';
+import { EventDispatcher, MOUSE, Quaternion, Vector3, Spherical, PerspectiveCamera, Vector2, MathUtils as THREEMath } from 'three';
 import { BoundedConvergence } from 'utils/BoundedConvergence';
 
 const TWEEN = require('tween.js');
