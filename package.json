@@ -20,8 +20,6 @@
     "esbuild": "^0.4.12",
     "shx": "^0.3.2",
     "three": "^0.117.1",
-    "tslib": "^2.0.0",
-    "tween.js": "^16.6.0",
     "typescript": "^3.9.5",
     "uglifycss": "0.0.29"
   }

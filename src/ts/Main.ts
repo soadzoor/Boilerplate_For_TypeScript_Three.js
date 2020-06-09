@@ -1,5 +1,5 @@
-import { SceneManager } from "./view/SceneManager";
-import { Model } from './model/Model';
+import {SceneManager} from "./view/SceneManager";
+import {Model} from "./model/Model";
 
 export class Main
 {
