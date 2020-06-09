@@ -1,62 +1,64 @@
 
 const LOCAL_ROOT = ".";
-const BUILD_DEV  = "build/dev";
+const BUILD_DEV = "build/dev";
 const BUILD_PROD = "build/prod";
 const NODE_MODULES_PATH = "./node_modules";
 
 const args = process.argv.slice(2);
 
-const shell = require('shelljs');
+const {build} = require("esbuild");
 
-if (args.indexOf("--prod") > -1) {
-
+if (args.indexOf("--prod") > -1)
+{
 	process.env.NODE_ENV = "production";
 }
 
-build_dev();
+buildApp();
 
-if (process.env.NODE_ENV === "production") {
-	build_prod();
+function buildApp()
+{
+	const isProduction = process.env.NODE_ENV === "production";
+	const buildFolder = isProduction ? BUILD_PROD : BUILD_DEV;
+
+	shx(`rm -rf ${buildFolder}`);
+	shx(`mkdir ${buildFolder}/`);
+	shx(`cp src/index.html ${buildFolder}/index.html`);
+	assets(buildFolder);
+	css(buildFolder);
+
+	if (isProduction)
+	{
+		exec_module("uglifycss", `${buildFolder}/css/style.css --output ${buildFolder}/css/style.css`);
+	}
+
+	const options = {
+		stdio: "inherit",
+		entryPoints: ["./src/ts/Main.ts"],
+		outfile: [`${buildFolder}/js/app.bundle.js`],
+		target: "es2017",
+		minify: isProduction,
+		sourcemap: !isProduction,
+		bundle: true
+	};
+
+	build(options).catch(() => process.exit(1));
 }
 
-function build_dev() {
-
-	shx(`rm -rf ${BUILD_DEV}`);
-	exec_module("webpack");
-
-	shx(`cp src/index.html ${BUILD_DEV}/index.html`);
-
-	assets();
-	css();
-}
-
-function build_prod() {
-	shx(`rm -rf ${BUILD_PROD}`);
-	shx(`cp -R ${BUILD_DEV}/ ${BUILD_PROD}/`);
-	shx(`rm -rf ${BUILD_PROD}/js/*.js.map`);
-
-	shell.ls(`${BUILD_PROD}/js`).forEach(jsFileName => {
-		exec_module("uglifyjs", `${BUILD_PROD}/js/${jsFileName} -o ${BUILD_PROD}/js/${jsFileName} --compress --mangle`);
-	});
-
-	exec_module("uglifycss", `${BUILD_PROD}/css/style.css --output ${BUILD_PROD}/css/style.css`);
-}
-
-function shx(command) {
-
+function shx(command)
+{
 	const module = "shx";
 	const args = command;
 
 	return exec_module(module, args);
 }
 
-function exec_module(module, args) {
-
+function exec_module(module, args)
+{
 	return exec(`"${NODE_MODULES_PATH}/.bin/${module}"`, args);
 }
 
-function exec(command, args) {
-
+function exec(command, args)
+{
 	//console.log("command", command, args);
 
 	args = args || "";
@@ -70,10 +72,12 @@ function exec(command, args) {
 		2
 	];
 
-	try {
+	try
+	{
 		var result = require("child_process").execSync(command + " " + args, {stdio: stdio});
 
-	} catch (e) {
+	} catch (e)
+	{
 		// this is needed for messages to display when from the typescript watcher
 		throw e;
 	}
@@ -81,12 +85,14 @@ function exec(command, args) {
 	return result;
 }
 
-function assets() {
+function assets(buildFolder)
+{
 
-	shx(`rm -rf ${BUILD_DEV}/assets`);
-	shx(`cp -R ${LOCAL_ROOT}/src/assets ${BUILD_DEV}/assets`);
+	shx(`rm -rf ${buildFolder}/assets`);
+	shx(`cp -R ${LOCAL_ROOT}/src/assets ${buildFolder}/assets`);
 }
 
-function css() {
-	shx(`cp -R src/css ${BUILD_DEV}/css`);
+function css(buildFolder)
+{
+	shx(`cp -R src/css ${buildFolder}/css`);
 }
