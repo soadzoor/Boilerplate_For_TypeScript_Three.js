@@ -16,6 +16,11 @@ buildApp();
 
 function buildApp()
 {
+	console.time("Build time");
+
+	console.log("\x1b[33m%s\x1b[0m", "Looking for type errors...");
+	exec("tsc", "--noEmit");
+	console.log("\x1b[33m%s\x1b[0m", "Copying static files...");
 	const isProduction = process.env.NODE_ENV === "production";
 	const buildFolder = isProduction ? BUILD_PROD : BUILD_DEV;
 
@@ -40,7 +45,12 @@ function buildApp()
 		bundle: true
 	};
 
+	console.log("\x1b[33m%s\x1b[0m", "Bundling js...");
+
 	build(options).catch(() => process.exit(1));
+
+	console.log("\x1b[32m%s\x1b[0m", "Build done!");
+	console.timeEnd("Build time");
 }
 
 function shx(command)
@@ -75,7 +85,8 @@ function exec(command, args)
 	{
 		var result = require("child_process").execSync(command + " " + args, {stdio: stdio});
 
-	} catch (e)
+	}
+	catch (e)
 	{
 		// this is needed for messages to display when from the typescript watcher
 		throw e;
