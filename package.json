@@ -18,9 +18,9 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^14.0.13",
-    "esbuild": "^0.5.11",
+    "esbuild": "^0.6.5",
     "shx": "^0.3.2",
-    "three": "^0.117.1",
+    "three": "^0.118.3",
     "tslib": "^2.0.0",
     "typescript": "^3.9.5",
     "uglifycss": "0.0.29"
