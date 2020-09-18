@@ -1,53 +1,74 @@
 const LOCAL_ROOT = ".";
 const BUILD_DEV = "build/dev";
 const BUILD_PROD = "build/prod";
+const BUILD_TEMP = "build/temp";
 const NODE_MODULES_PATH = "./node_modules";
-
+const fs = require("fs"); // it's included in node.js by default, no need for any additional packages
 const args = process.argv.slice(2);
-
-const {build} = require("esbuild");
-
-if (args.indexOf("--prod") > -1)
+if (args.includes("--prod"))
 {
 	process.env.NODE_ENV = "production";
 }
+const isProduction = process.env.NODE_ENV === "production";
+const buildFolder = isProduction ? BUILD_PROD : BUILD_DEV;
+const checkForTypeErrors = !args.includes("--fast");
+
+const reactFileSuffixDevelopment = "development";
+const reactFileSuffixProd = "production.min";
+const reactFileSuffix = isProduction ? reactFileSuffixProd : reactFileSuffixDevelopment;
+
+const {build} = require("esbuild");
 
 buildApp();
 
-function buildApp()
+async function buildApp()
 {
 	console.time("Build time");
 
-	console.log("\x1b[33m%s\x1b[0m", "Looking for type errors...");
-	exec("tsc", "--noEmit");
+	if (checkForTypeErrors)
+	{
+		console.log("\x1b[33m%s\x1b[0m", "Looking for type errors...");
+
+		try
+		{
+			if (isProduction)
+			{
+				res = exec("tsc", "--noEmit");
+			}
+			else
+			{
+				res = exec("tsc", `--incremental --composite false --tsBuildInfoFile ${BUILD_TEMP}/tsconfig.tsbuildinfo`);
+			}
+		}
+		catch (e)
+		{
+			// typescript error
+			process.exit(1);
+		}
+	}
+
 	console.log("\x1b[33m%s\x1b[0m", "Copying static files...");
-	const isProduction = process.env.NODE_ENV === "production";
-	const buildFolder = isProduction ? BUILD_PROD : BUILD_DEV;
 
 	shx(`rm -rf ${buildFolder}`);
 	shx(`mkdir ${buildFolder}/`);
 	shx(`cp src/index.html ${buildFolder}/index.html`);
-	assets(buildFolder);
-	css(buildFolder);
 
+	assets(buildFolder);
+
+	const promises = [
+		css(buildFolder),
+		buildJs(buildFolder)
+	];
 	if (isProduction)
 	{
-		exec_module("uglifycss", `${buildFolder}/css/style.css --output ${buildFolder}/css/style.css`);
+		promises.push(
+			// shx(`sed -i 's/${reactFileSuffixDevelopment}.js/${reactFileSuffixProd}.js/g' ${buildFolder}/index.html`);
+			// sed is not built-in to windows by default, so here's a cross-platform solution:
+			replaceTextInFile(`${buildFolder}/index.html`, reactFileSuffixDevelopment, reactFileSuffixProd)
+		);
 	}
 
-	const options = {
-		stdio: "inherit",
-		entryPoints: ["./src/ts/Main.ts"],
-		outfile: [`${buildFolder}/js/app.bundle.js`],
-		target: "es2017",
-		minify: isProduction,
-		sourcemap: !isProduction,
-		bundle: true
-	};
-
-	console.log("\x1b[33m%s\x1b[0m", "Bundling js...");
-
-	build(options).catch(() => process.exit(1));
+	await Promise.all(promises);
 
 	console.log("\x1b[32m%s\x1b[0m", "Build done!");
 	console.timeEnd("Build time");
@@ -75,16 +96,16 @@ function exec(command, args)
 	// http://stackoverflow.com/questions/30134236/use-child-process-execsync-but-keep-output-in-console
 	// https://nodejs.org/api/child_process.html#child_process_child_stdio
 
-	var stdio = [
+	const stdio = [
 		0,
 		1, // !
 		2
 	];
 
+	let result;
 	try
 	{
-		var result = require("child_process").execSync(command + " " + args, {stdio: stdio});
-
+		result = require("child_process").execSync(command + " " + args, {stdio: stdio});
 	}
 	catch (e)
 	{
@@ -97,12 +118,76 @@ function exec(command, args)
 
 function assets(buildFolder)
 {
-
+	console.log("\x1b[33m%s\x1b[0m", "Copying assets...");
 	shx(`rm -rf ${buildFolder}/assets`);
 	shx(`cp -R ${LOCAL_ROOT}/src/assets ${buildFolder}/assets`);
+}
+
+function readTextFile(filePath)
+{
+	return new Promise((resolve, reject) =>
+	{
+		fs.readFile(filePath, function (err, data)
+		{
+			if (err)
+			{
+				reject(err);
+			}
+			else
+			{
+				resolve(data.toString());
+			}
+		});
+	});
+}
+
+function writeTextFile(filePath, data)
+{
+	return new Promise((resolve, reject) =>
+	{
+		fs.writeFile(filePath, data, function (err)
+		{
+			if (err)
+			{
+				reject(err);
+			}
+			else
+			{
+				resolve(data);
+			}
+		});
+	});
+}
+
+async function replaceTextInFile(filePath, oldText, newText)
+{
+	const regExp = new RegExp(oldText, "g");
+	const fileContent = await readTextFile(filePath);
+	await writeTextFile(filePath, fileContent.replace(regExp, newText));
 }
 
 function css(buildFolder)
 {
 	shx(`cp -R src/css ${buildFolder}/css`);
+}
+
+function buildJs(buildFolder)
+{
+	const jsFile = `${buildFolder}/src/app.bundle.js`;
+
+	const options = {
+		entryPoints: ["./src/ts/Main.ts"],
+		target: "es2017",
+		minify: isProduction,
+		sourcemap: !isProduction,
+		bundle: true,
+		//splitting: true, // for dynamic import (await import)
+		//outdir: buildFolder,
+		outfile: jsFile,
+		//format: "esm"
+	};
+
+	console.log("\x1b[33m%s\x1b[0m", "Bundling js...");
+
+	return build(options);
 }
