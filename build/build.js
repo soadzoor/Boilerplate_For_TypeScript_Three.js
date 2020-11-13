@@ -173,7 +173,7 @@ function css(buildFolder)
 
 function buildJs(buildFolder)
 {
-	const jsFile = `${buildFolder}/src/app.bundle.js`;
+	const jsFile = `${buildFolder}/js/app.bundle.js`;
 
 	const options = {
 		entryPoints: ["./src/ts/Main.ts"],
