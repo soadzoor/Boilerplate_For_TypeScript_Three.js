@@ -23,7 +23,7 @@ body {
 	flex-direction: column;
 }
 
-main {
+#playGround {
 	background-color: #cccccc;
 	flex: 1;
 	display: flex;
