@@ -13,10 +13,6 @@ const isProduction = process.env.NODE_ENV === "production";
 const buildFolder = isProduction ? BUILD_PROD : BUILD_DEV;
 const checkForTypeErrors = !args.includes("--fast");
 
-const reactFileSuffixDevelopment = "development";
-const reactFileSuffixProd = "production.min";
-const reactFileSuffix = isProduction ? reactFileSuffixProd : reactFileSuffixDevelopment;
-
 const {build} = require("esbuild");
 
 buildApp();
@@ -59,14 +55,6 @@ async function buildApp()
 		css(buildFolder),
 		buildJs(buildFolder)
 	];
-	if (isProduction)
-	{
-		promises.push(
-			// shx(`sed -i 's/${reactFileSuffixDevelopment}.js/${reactFileSuffixProd}.js/g' ${buildFolder}/index.html`);
-			// sed is not built-in to windows by default, so here's a cross-platform solution:
-			replaceTextInFile(`${buildFolder}/index.html`, reactFileSuffixDevelopment, reactFileSuffixProd)
-		);
-	}
 
 	await Promise.all(promises);
 
