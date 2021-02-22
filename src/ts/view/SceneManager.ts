@@ -21,7 +21,7 @@ export class SceneManager
 
 	constructor()
 	{
-		this._canvas = <HTMLCanvasElement>document.getElementById("myCanvas");
+		this._canvas = document.getElementById("myCanvas") as HTMLCanvasElement;
 		this._scene = new Scene();
 		this._camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.05, 70);
 
@@ -60,7 +60,7 @@ export class SceneManager
 
 	private initControls()
 	{
-		this._controls = new CameraControls(this._canvas, this);
+		this._controls = new CameraControls(this._canvas.parentElement, this);
 		this._controls.activate();
 	}
 
