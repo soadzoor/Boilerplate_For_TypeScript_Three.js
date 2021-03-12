@@ -17,6 +17,8 @@ export class SceneManager
 	private _normalizedCameraPosition: number[] = [0, 0, 1];
 	private _sceneLoader: SceneLoader;
 	private static _timeStamp: number = 0;
+	private static _deltaFrame: number = 1000;
+	public static prevTimeStamp: number = 0;
 	public needsRender = true;
 
 	constructor()
@@ -36,11 +38,9 @@ export class SceneManager
 
 	private initBackground()
 	{
-		const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !((<any>window).MSStream);
-
 		this._scene.add(new VignetteBackground({
 			aspect: this._camera.aspect,
-			grainScale: IS_IOS ? 0 : 0.001, // mattdesl/three-vignette-background#1
+			grainScale: Constants.isIOS ? 0 : 0.001, // mattdesl/three-vignette-background#1
 			colors: ["#ffffff", "#353535"]
 		}).mesh);
 	}
@@ -53,7 +53,7 @@ export class SceneManager
 		const light2 = new DirectionalLight(0xFFFFFF, 0.1);
 		light2.position.set(0.5, 0, 0.866); // ~60ยบ
 
-		const light3 = new HemisphereLight(0xffffbb, 0x080820, 0.8);
+		const light3 = new HemisphereLight(0xffffff, 0x080820, 0.75);
 
 		this._scene.add(light1, light2, light3);
 	}
@@ -118,6 +118,8 @@ export class SceneManager
 	private update = (time: number) =>
 	{
 		SceneManager._timeStamp = performance.now();
+		SceneManager._deltaFrame = SceneManager._timeStamp - SceneManager.prevTimeStamp;
+		SceneManager.prevTimeStamp = SceneManager._timeStamp;
 		this.needsRender = Convergence.updateActiveOnes(SceneManager._timeStamp) || this.needsRender;
 		if (this.needsRender)
 		{
@@ -143,6 +145,12 @@ export class SceneManager
 	public static get timeStamp()
 	{
 		return SceneManager._timeStamp;
+	}
+
+	/** Returns the time between the last 2 frames, so we can get an idea of the user's FPS */
+	public static get deltaFrame()
+	{
+		return SceneManager._deltaFrame;
 	}
 
 	public get distance()

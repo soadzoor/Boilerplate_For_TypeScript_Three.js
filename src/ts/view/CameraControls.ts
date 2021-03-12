@@ -66,7 +66,7 @@ export class CameraControls
 	private _dampOnPointerUp: boolean = false;
 
 	private _enabled: boolean = false;
-	private _autoRotate: boolean = true;
+	private _autoRotation: number[] = [Constants.AUTOROTATION_SPEED, 0];
 
 	private readonly SENSITIVITY = 1.2;
 	private _prevSpeed: number[] = [];
@@ -350,7 +350,8 @@ export class CameraControls
 
 	private stopRotating()
 	{
-		this._autoRotate = false;
+		this._autoRotation[0] = 0;
+		this._autoRotation[1] = 0;
 
 		this._u.reset(this._u.value, this._u.value);
 		this._v.reset(this._v.value, this._v.value);
@@ -360,9 +361,14 @@ export class CameraControls
 	{
 		if (this._enabled)
 		{
-			if (this._autoRotate)
+			if (this._autoRotation[0] !== 0)
 			{
-				this._u.reset(this._u.end + 0.0005, this._u.end + 0.0005);
+				this._u.reset(this._u.end + this._autoRotation[0] * SceneManager.deltaFrame, this._u.end + this._autoRotation[0] * SceneManager.deltaFrame);
+			}
+
+			if (this._autoRotation[1] !== 0)
+			{
+				this._v.reset(this._v.end + this._autoRotation[1] * SceneManager.deltaFrame, this._v.end + this._autoRotation[1] * SceneManager.deltaFrame, undefined, undefined, true);
 			}
 
 			if (this._u.hasChangedSinceLastTick || this._v.hasChangedSinceLastTick)
