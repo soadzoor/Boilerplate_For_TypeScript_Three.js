@@ -45,7 +45,6 @@ export class SceneManager
 		}).mesh);
 	}
 
-
 	private initLights()
 	{
 		const light1 = new AmbientLight(0xFFFFFF, 0.1);

@@ -62,7 +62,7 @@ export class CameraControls
 		}
 	};
 	private _cameraNormalizedPosition: number[] = VectorUtils.normalize([-1, 0.3, 0]);
-	private _timeoutID: number = null;
+	private _timeoutId: number = null;
 	private _dampOnPointerUp: boolean = false;
 
 	private _enabled: boolean = false;
@@ -232,8 +232,8 @@ export class CameraControls
 				this._pointer.prevTimeStamp = timeStamp;
 
 				this._dampOnPointerUp = true;
-				clearTimeout(this._timeoutID);
-				this._timeoutID = setTimeout(this.cancelDamping, 100) as any;
+				clearTimeout(this._timeoutId);
+				this._timeoutId = setTimeout(this.cancelDamping, 100) as any;
 			}
 		}
 	}
