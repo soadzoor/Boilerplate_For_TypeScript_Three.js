@@ -233,7 +233,7 @@ export class CameraControls
 
 				this._dampOnPointerUp = true;
 				clearTimeout(this._timeoutId);
-				this._timeoutId = setTimeout(this.cancelDamping, 100) as any;
+				this._timeoutId = window.setTimeout(this.cancelDamping, 100);
 			}
 		}
 	}

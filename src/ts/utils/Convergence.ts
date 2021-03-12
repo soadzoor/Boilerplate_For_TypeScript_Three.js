@@ -128,10 +128,10 @@ export class Convergence
 		if (!clampBetweenMinAndMax)
 		{
 			clearTimeout(this._timeoutId);
-			this._timeoutId = setTimeout(() =>
+			this._timeoutId = window.setTimeout(() =>
 			{
 				this._end = MathUtils.clamp(this._end, this._min, this._max);
-			}, this._animationDuration) as any;
+			}, this._animationDuration);
 		}
 	}
 
