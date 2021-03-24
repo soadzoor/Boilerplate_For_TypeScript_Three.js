@@ -1,30 +1,42 @@
+import {EquirectangularReflectionMapping, Group, Mesh, MeshStandardMaterial, Object3D, Texture, TextureLoader} from "three";
 import {GLTFLoader, GLTF} from "three/examples/jsm/loaders/GLTFLoader";
-import {SceneManager} from "./SceneManager";
 
 export class SceneLoader
 {
-	private _sceneManager: SceneManager;
-	private _url: string;
+	private static _envMap: Texture;
 
-	constructor(scene: SceneManager, url: string)
+	private static get envMap()
 	{
-		this._sceneManager = scene;
-		this._url = url;
+		if (!this._envMap)
+		{
+			this._envMap = new TextureLoader().load("assets/images/environment.jpg");
+			this._envMap.mapping = EquirectangularReflectionMapping;
+		}
 
-		this.loadScene(this._url);
+		return this._envMap;
 	}
 
-	private loadScene = (url: string) =>
+	public static loadScene(url: string)
 	{
-		const gltfLoader = new GLTFLoader();
+		return new Promise<Group>((resolve, reject) =>
+		{
+			const gltfLoader = new GLTFLoader();
 
-		gltfLoader.load(url, this.onLoad);
-	};
-
-	private onLoad = (gltf: GLTF) =>
-	{
-		const object = gltf.scene;
-		this._sceneManager.scene.add(object);
-		this._sceneManager.needsRender = true;
-	};
+			gltfLoader.load(url, (gltf: GLTF) =>
+			{
+				gltf.scene.traverse((object: Object3D) =>
+				{
+					if (object instanceof Mesh)
+					{
+						const material = object.material as MeshStandardMaterial;
+						if (material.envMap === null)
+						{
+							material.envMap = this.envMap;
+						}
+					}
+				});
+				resolve(gltf.scene);
+			});
+		});
+	}
 }

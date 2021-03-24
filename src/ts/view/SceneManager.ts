@@ -1,4 +1,4 @@
-import {Scene, PerspectiveCamera, WebGLRenderer, AmbientLight, DirectionalLight, HemisphereLight, Vector3, GammaEncoding} from "three";
+import {Scene, PerspectiveCamera, WebGLRenderer, AmbientLight, DirectionalLight, HemisphereLight, GammaEncoding} from "three";
 import {CameraControls} from "./CameraControls";
 import {SceneLoader} from "./SceneLoader";
 import {VignetteBackground} from "./VignetteBackground";
@@ -15,7 +15,6 @@ export class SceneManager
 	private _renderer: WebGLRenderer;
 	private _distance: BoundedConvergence = new BoundedConvergence(10, 10, 1, 100, Easing.EASE_OUT, Constants.ANIMATION_DURATION);
 	private _normalizedCameraPosition: number[] = [0, 0, 1];
-	private _sceneLoader: SceneLoader;
 	private static _timeStamp: number = 0;
 	private static _deltaFrame: number = 1000;
 	public static prevTimeStamp: number = 0;
@@ -27,11 +26,16 @@ export class SceneManager
 		this._scene = new Scene();
 		this._camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.05, 70);
 
+		this.init();
+	}
+
+	private async init()
+	{
 		this.initBackground();
 		this.initLights();
 		this.initControls();
 		this.initRenderer();
-		this.initMeshes();
+		await this.initMeshes();
 		this.onWindowResize();
 		this.animate(0);
 	}
@@ -63,9 +67,9 @@ export class SceneManager
 		this._controls.activate();
 	}
 
-	private initMeshes()
+	private async initMeshes()
 	{
-		this._sceneLoader = new SceneLoader(this, "assets/models/test.glb");
+		this._scene.add(await SceneLoader.loadScene("assets/models/test.glb"));
 	}
 
 	private initRenderer()
