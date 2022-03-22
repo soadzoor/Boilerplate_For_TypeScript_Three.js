@@ -1,5 +1,4 @@
-import {Mesh, PlaneBufferGeometry, RawShaderMaterial, FrontSide, Vector2, Color} from "three";
-import {SceneManager} from "./SceneManager";
+import {Color, FrontSide, Mesh, PlaneBufferGeometry, RawShaderMaterial, Vector2} from "three";
 
 /**Based on https://github.com/mattdesl/three-vignette-background */
 

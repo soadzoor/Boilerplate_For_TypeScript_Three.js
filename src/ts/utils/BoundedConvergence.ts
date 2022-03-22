@@ -1,3 +1,4 @@
+import {ISceneManager} from "../view/SceneManagerType";
 import {Convergence, Easing} from "./Convergence";
 import {MathUtils} from "./MathUtils";
 import {Constants} from "./Constants";
@@ -7,9 +8,9 @@ export class BoundedConvergence extends Convergence
 	private _originalMax: number;
 	private _originalMin: number;
 
-	constructor(start: number, end: number, min: number, max: number, easing: Easing = Easing.EASE_OUT, animationTime: number = Constants.ANIMATION_DURATION, triggerRender: boolean = true)
+	constructor(sceneManager: ISceneManager, start: number, end: number, min: number, max: number, easing: Easing = Easing.EASE_OUT, animationTime: number = Constants.ANIMATION_DURATION, triggerRender: boolean = true)
 	{
-		super(start, end, easing, animationTime, triggerRender);
+		super(sceneManager, start, end, easing, animationTime, triggerRender);
 		this._originalMin = this._min = min;
 		this._originalMax = this._max = max;
 	}

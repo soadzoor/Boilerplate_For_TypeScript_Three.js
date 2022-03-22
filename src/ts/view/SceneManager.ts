@@ -1,23 +1,25 @@
-import {Scene, PerspectiveCamera, WebGLRenderer, AmbientLight, DirectionalLight, HemisphereLight, sRGBEncoding} from "three";
+import {AmbientLight, DirectionalLight, HemisphereLight, PerspectiveCamera, Scene, WebGLRenderer, sRGBEncoding} from "three";
+import {WarningWindow} from "../popups/WarningWindow";
+import {Convergence, Easing} from "../utils/Convergence";
+import {BoundedConvergence} from "../utils/BoundedConvergence";
+import {Constants} from "../utils/Constants";
 import {CameraControls} from "./CameraControls";
 import {SceneLoader} from "./SceneLoader";
 import {VignetteBackground} from "./VignetteBackground";
-import {Convergence, Easing} from "utils/Convergence";
-import {BoundedConvergence} from "utils/BoundedConvergence";
-import {Constants} from "utils/Constants";
+import {ISceneManager} from "./SceneManagerType";
 
-export class SceneManager
+export default class SceneManager implements ISceneManager
 {
 	private _canvas: HTMLCanvasElement;
 	private _scene: Scene;
 	private _camera: PerspectiveCamera;
 	private _controls: CameraControls;
 	private _renderer: WebGLRenderer;
-	private _distance: BoundedConvergence = new BoundedConvergence(10, 10, 1, 100, Easing.EASE_OUT, Constants.ANIMATION_DURATION);
+	private _distance: BoundedConvergence;
 	private _normalizedCameraPosition: number[] = [0, 0, 1];
-	private static _timeStamp: number = 0;
-	private static _deltaFrame: number = 1000;
-	public static prevTimeStamp: number = 0;
+	private _prevTimeStamp: number = 0;
+	private _timeStamp: number = 0;
+	private _deltaFrame: number = 1000;
 	public needsRender = true;
 
 	constructor()
@@ -26,7 +28,9 @@ export class SceneManager
 		this._scene = new Scene();
 		this._camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.05, 70);
 
-		this._controls = new CameraControls(this._canvas, this);
+		this._distance = new BoundedConvergence(this, 10, 10, 1, 100, Easing.EASE_OUT, Constants.ANIMATION_DURATION);
+
+		this._controls = new CameraControls(this._canvas.parentElement!, this);
 
 		const contextAttributes = {
 			alpha: true,
@@ -57,7 +61,7 @@ export class SceneManager
 	{
 		this._scene.add(new VignetteBackground({
 			aspect: this._camera.aspect,
-			grainScale: Constants.isIOS ? 0 : 0.001, // mattdesl/three-vignette-background#1
+			grainScale: Constants.isIOS ? 0 : 0.001, // See mattdesl/three-vignette-background#1
 			colors: ["#ffffff", "#353535"]
 		}).mesh);
 	}
@@ -108,11 +112,11 @@ export class SceneManager
 		this._camera.updateProjectionMatrix();
 	};
 
-	private onContextLost = (event: Event) =>
+	private onContextLost = async (event: Event) =>
 	{
 		event.preventDefault();
 
-		alert("Unfortunately WebGL has crashed. Please reload the page to continue!");
+		await WarningWindow.open("Unfortunately WebGL has crashed. Please reload the page to continue!");
 	};
 
 	public get scene()
@@ -122,10 +126,10 @@ export class SceneManager
 
 	private update = (time: number) =>
 	{
-		SceneManager._timeStamp = performance.now();
-		SceneManager._deltaFrame = SceneManager._timeStamp - SceneManager.prevTimeStamp;
-		SceneManager.prevTimeStamp = SceneManager._timeStamp;
-		this.needsRender = Convergence.updateActiveOnes(SceneManager._timeStamp) || this.needsRender;
+		this._timeStamp = performance.now();
+		this._deltaFrame = this._timeStamp - this._prevTimeStamp;
+		this._prevTimeStamp = this._timeStamp;
+		this.needsRender = Convergence.updateActiveOnes(this._timeStamp) || this.needsRender;
 		if (this.needsRender)
 		{
 			this._normalizedCameraPosition = this._controls.update();
@@ -147,15 +151,15 @@ export class SceneManager
 	};
 
 	/** Returns the timestamp of the newest render run  */
-	public static get timeStamp()
+	public get timeStamp()
 	{
-		return SceneManager._timeStamp;
+		return this._timeStamp;
 	}
 
 	/** Returns the time between the last 2 frames, so we can get an idea of the user's FPS */
-	public static get deltaFrame()
+	public get deltaFrame()
 	{
-		return SceneManager._deltaFrame;
+		return this._deltaFrame;
 	}
 
 	public get distance()

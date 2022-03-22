@@ -17,7 +17,7 @@ const checkForTypeErrors = !args.includes("--fast");
 const yellowConsole = "\x1b[33m%s\x1b[0m";
 
 const timeStamp = getDateTime();
-let jsFile = "app.bundle.js";
+let jsFile = "App.ts";
 const jsSubFolder = "src";
 
 const {build} = require("esbuild");
@@ -66,7 +66,7 @@ async function buildApp()
 
 	await Promise.all(promises);
 
-	console.log(yellowConsole, "Finalizing...");
+	console.log(yellowConsole, "Adding timestamps to filenames...");
 	
 	const methodsToDoAfterBundling = [];
 	let finalJsFullPath = "";
@@ -80,14 +80,14 @@ async function buildApp()
 		{
 			shx(`mv ${buildFolder}/${originalJsFilePath} ${finalJsFullPath}`);
 		});
-		await replaceTextInFile(`${buildFolder}/index.html`, `<script src="${jsSubFolder}/${jsFile}"></script>`, `<script type="module" src="${newJsFilePath}"></script>`);
+		await replaceTextInFile(`${buildFolder}/index.html`, `<script type="module" src="ts/${jsFile}"></script>`, `<script type="module" src="${newJsFilePath}"></script>`);
 	}
 	else
 	{
 		const originalJsFile = jsFile;
 		jsFile = originalJsFile.replace(".js", `.${timeStamp}.js`);
 		finalJsFullPath = `${buildFolder}/${jsSubFolder}/${jsFile}`
-		await replaceTextInFile(`${buildFolder}/index.html`, `<script src="${jsSubFolder}/${originalJsFile}"></script>`, `<script src="${jsSubFolder}/${jsFile}"></script>`);
+		await replaceTextInFile(`${buildFolder}/index.html`, `<script type="module" src="${jsSubFolder}/${originalJsFile}"></script>`, `<script src="${jsSubFolder}/${jsFile}"></script>`);
 	}
 
 	for (const methodToDo of methodsToDoAfterBundling)
@@ -95,9 +95,76 @@ async function buildApp()
 		methodToDo();
 	}
 
+	if (isProduction)
+	{
+		console.log("\x1b[33m%s\x1b[0m", "Minifying shaders...");
+		await minifyShaders(finalJsFullPath);
+	}
 
 	console.log("\x1b[32m%s\x1b[0m", "Build done!");
 	console.timeEnd("Build time");
+}
+
+async function minifyShaders(finalJsFullPath)
+{
+	// Assumes we're using backticks (`) for shaders, and define "precision highp float" in the beginning
+	const bundleJs = await readTextFile(finalJsFullPath);
+
+	let optimizedBundleJs = bundleJs;
+
+	let shaderStartIndex = 0;
+
+	const keyword = "precision highp float;";
+
+	shaderStartIndex = optimizedBundleJs.indexOf(keyword, shaderStartIndex);
+
+	while (shaderStartIndex > -1)
+	{
+		const shaderEndIndex = optimizedBundleJs.indexOf("`", shaderStartIndex);
+		const shader = optimizedBundleJs.substring(shaderStartIndex, shaderEndIndex);
+		const minifiedShader = minifyGlsl(shader);
+
+		optimizedBundleJs = `${optimizedBundleJs.substring(0, shaderStartIndex)}${minifiedShader}${optimizedBundleJs.substring(shaderEndIndex)}`;
+
+		++shaderStartIndex;
+		shaderStartIndex = optimizedBundleJs.indexOf(keyword, shaderStartIndex);
+	}
+
+	await writeTextFile(finalJsFullPath, optimizedBundleJs);
+}
+
+function minifyGlsl(input)
+{
+	// remove all comments
+	// https://stackoverflow.com/questions/5989315/regex-for-match-replacing-javascript-comments-both-multiline-and-inline
+	let output = input
+		.replace(/(\/\*(?:(?!\*\/).|[\n\r])*\*\/)/g, "") // multiline comment
+		.replace(/(\/\/[^\n\r]*[\n\r]+)/g, ""); // single line comment
+
+	// replace defitionions with values throughout the whole glsl code
+	let indexOfDefine = output.indexOf("#define");
+	while (indexOfDefine > -1)
+	{
+		const endOfLineIndex = output.indexOf("\n", indexOfDefine);
+		const row = output.substring(indexOfDefine, endOfLineIndex);
+
+		// replace #define rows with empty string
+		output = `${output.substring(0, indexOfDefine)}${output.substring(endOfLineIndex)}`;
+
+		const definitions = row.split(" ");
+		const key = definitions[1];
+		const value = definitions.slice(2).join(" "); // value might contain spaces, like vec3(0.0, 0.5, 0.2)
+
+		const regExp = new RegExp(key, "gm");
+		output = output.replace(regExp, value);
+
+		indexOfDefine = output.indexOf("#define");
+	}
+
+	// Remove whitespaces
+	output = output.replace(/(\s)+/gm, " ").replace(/; /gm, ";");
+
+	return output;
 }
 
 function formatDateSegment(dateSegment /* number */)
@@ -220,7 +287,7 @@ function css(buildFolder)
 		console.log(yellowConsole, "Creating CSS from SASS...");
 
 		const outFolder = `${buildFolder}/css`;
-		const originalFileName = `main.css`;
+		const originalFileName = `main.scss`;
 		const timeStampedFileName = `main.${timeStamp}.css`;
 		const outFile = `${outFolder}/${timeStampedFileName}`;
 
@@ -250,7 +317,7 @@ function css(buildFolder)
 				exec_module("uglifycss", `${outFile} --output ${outFile}`);
 			}
 
-			await replaceTextInFile(`${buildFolder}/index.html`, `css/${originalFileName}`, `css/${timeStampedFileName}`);
+			await replaceTextInFile(`${buildFolder}/index.html`, `sass/${originalFileName}`, `css/${timeStampedFileName}`);
 
 			resolve();
 		}

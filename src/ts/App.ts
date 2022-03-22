@@ -1,26 +1,8 @@
-import {SceneManager} from "./view/SceneManager";
-import {Model} from "./model/Model";
+import SceneManager from "./view/SceneManager";
 
-export class App
+function App()
 {
-	private _model: Model;
-	private _sceneManager: SceneManager;
-
-	constructor()
-	{
-		this._model = new Model();
-		this._sceneManager = new SceneManager();
-	}
-
-	public get scene()
-	{
-		return this._sceneManager;
-	}
-
-	public get model()
-	{
-		return this._model;
-	}
+	const scene = new SceneManager();
 }
 
-const app = new App();
+const app = App();

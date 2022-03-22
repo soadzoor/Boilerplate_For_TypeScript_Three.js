@@ -1,5 +1,6 @@
+import {ISceneManager} from "../view/SceneManagerType";
 import {Constants} from "./Constants";
-import {SceneManager} from "view/SceneManager";
+import {IConvergence} from "./ConvergenceType";
 import {MathUtils} from "./MathUtils";
 
 /** This class is mainly for animating anything seamlessly and smoothly.
@@ -12,16 +13,11 @@ export enum Easing
 	EASE_IN_OUT
 }
 
-export class Convergence
+export class Convergence implements IConvergence
 {
 	private static _activeInstances: Convergence[] = [];
+	private _sceneManager: ISceneManager;
 	private _timeStampAtSetEnd: number = 0;
-	protected _originalStart: number;
-	protected _originalEnd: number;
-	protected _start: number;
-	protected _end: number;
-	protected _min: number = -Infinity;
-	protected _max: number = Infinity;
 	private _value: number; // current value (between start and end)
 	private _animationDuration: number; // ms
 	private _originalAnimationDuration: number; // ms
@@ -32,9 +28,16 @@ export class Convergence
 	private _easing: Easing = Easing.EASE_OUT;
 	private _timeoutId: number = -1;
 	private _triggerRender: boolean;
+	protected _originalStart: number;
+	protected _originalEnd: number;
+	protected _start: number;
+	protected _end: number;
+	protected _min: number = -Infinity;
+	protected _max: number = Infinity;
 
-	constructor(start: number, end: number, easing: Easing = Easing.EASE_OUT, animationDuration: number = Constants.ANIMATION_DURATION, triggerRender: boolean = true)
+	constructor(sceneManager: ISceneManager, start: number, end: number, easing: Easing = Easing.EASE_OUT, animationDuration: number = Constants.ANIMATION_DURATION, triggerRender: boolean = true)
 	{
+		this._sceneManager = sceneManager;
 		this._originalStart = start;
 		this._start = start;
 		this._originalEnd = end;
@@ -123,7 +126,7 @@ export class Convergence
 		Convergence.addToActiveOnes(this);
 		this._start = this._value;
 		this._end = newEnd;
-		this._timeStampAtSetEnd = SceneManager.timeStamp;
+		this._timeStampAtSetEnd = this._sceneManager.timeStamp;
 
 		if (!clampBetweenMinAndMax)
 		{
@@ -141,7 +144,7 @@ export class Convergence
 		Convergence.addToActiveOnes(this);
 		this._start = start != null ? start : this._originalStart;
 		this._end = end != null ? end : this._originalEnd;
-		this._timeStampAtSetEnd = SceneManager.timeStamp;
+		this._timeStampAtSetEnd = this._sceneManager.timeStamp;
 	}
 
 	private update(timeStamp: number)

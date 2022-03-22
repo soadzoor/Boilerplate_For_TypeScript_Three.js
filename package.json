@@ -1,12 +1,15 @@
 {
-  "name": "Title",
-  "version": "1.0.0",
-  "description": "Title",
+  "name": "3dworld",
+  "version": "0.0.1",
+  "description": "3D World",
   "main": "",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
+    "start": "node build/start",
+    "eslint:report": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --report-unused-disable-directives",
+    "eslint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --report-unused-disable-directives --fix",
     "build": "node build/build",
     "build:prod": "node build/build --prod"
   },
@@ -22,7 +25,10 @@
   "devDependencies": {
     "@types/node": "17.0.22",
     "@types/three": "0.138.0",
+    "@typescript-eslint/eslint-plugin": "5.16.0",
     "esbuild": "0.14.27",
+    "eslint": "8.11.0",
+    "eslint-plugin-import": "2.25.4",
     "sass": "1.49.9",
     "shx": "0.3.4",
     "tslib": "2.3.1",

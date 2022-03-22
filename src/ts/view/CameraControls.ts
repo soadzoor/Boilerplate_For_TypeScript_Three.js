@@ -1,22 +1,23 @@
+import {Signal} from "../utils/Signal";
 import {BoundedConvergence} from "../utils/BoundedConvergence";
-import {SceneManager} from "./SceneManager";
 import {Constants} from "../utils/Constants";
-import {Easing} from "utils/Convergence";
-import {VectorUtils} from "utils/VectorUtils";
+import {Easing} from "../utils/Convergence";
+import {VectorUtils} from "../utils/VectorUtils";
+import {ISceneManager} from "./SceneManagerType";
 
 export class CameraControls
 {
 	private _domElement: HTMLElement;
 	private _isPointerDown: boolean = false;
-	private _sceneManager: SceneManager;
+	private _sceneManager: ISceneManager;
 	private _mouseMoved: boolean = true;
 	private _triggerClickThreshold: {
 		deltaCursor: number;
 		deltaTime: number
 	} = {
-		deltaCursor: 3,
-		deltaTime: 1000
-	};
+			deltaCursor: 3,
+			deltaTime: 1000
+		};
 	private _pointer: {
 		downTimeStamp: number;
 		startX: number;
@@ -29,19 +30,19 @@ export class CameraControls
 		prevDeltaTime: number;
 		triggerClickOnPointerUp: boolean;
 	} = {
-		downTimeStamp: -1,
-		startX: -1,
-		startY: -1,
-		prevX: null,
-		prevY: null,
-		prevDeltaX: 0,
-		prevDeltaY: 0,
-		prevTimeStamp: 0,
-		prevDeltaTime: 1,
-		triggerClickOnPointerUp: false
-	};
-	private _u: BoundedConvergence = new BoundedConvergence(0, 0, -Infinity, Infinity, Easing.EASE_OUT, Constants.DAMPING_DURATION);
-	private _v: BoundedConvergence = new BoundedConvergence(Math.PI / 2, Math.PI / 2, 0.01, 3.14, Easing.EASE_OUT, Constants.DAMPING_DURATION);
+			downTimeStamp: -1,
+			startX: -1,
+			startY: -1,
+			prevX: null,
+			prevY: null,
+			prevDeltaX: 0,
+			prevDeltaY: 0,
+			prevTimeStamp: 0,
+			prevDeltaTime: 1,
+			triggerClickOnPointerUp: false
+		};
+	private _u: BoundedConvergence;
+	private _v: BoundedConvergence;
 	private _pinch: {
 		startValue: {
 			touchDistance: number;
@@ -52,15 +53,15 @@ export class CameraControls
 			distanceValue: number;
 		};
 	} = {
-		startValue: {
-			touchDistance: -1,
-			distanceValue: -1
-		},
-		currentValue: {
-			touchDistance: -1,
-			distanceValue: -1
-		}
-	};
+			startValue: {
+				touchDistance: -1,
+				distanceValue: -1
+			},
+			currentValue: {
+				touchDistance: -1,
+				distanceValue: -1
+			}
+		};
 	private _cameraNormalizedPosition: number[] = VectorUtils.normalize([-1, 0.3, 0]);
 	private _timeoutId: number = -1;
 	private _dampOnPointerUp: boolean = false;
@@ -71,10 +72,17 @@ export class CameraControls
 	private readonly SENSITIVITY = 1.2;
 	private _prevSpeed: number[] = [];
 
-	constructor(domElement: HTMLElement, sceneManager: SceneManager)
+	public signals = {
+		click: Signal.create<{clientX: number, cientY: number}>()
+	};
+
+	constructor(domElement: HTMLElement, sceneManager: ISceneManager)
 	{
 		this._domElement = domElement;
 		this._sceneManager = sceneManager;
+
+		this._u = new BoundedConvergence(this._sceneManager, 0, 0, -Infinity, Infinity, Easing.EASE_OUT, Constants.DAMPING_DURATION);
+		this._v = new BoundedConvergence(this._sceneManager, Math.PI / 2, Math.PI / 2, 0.01, 3.14, Easing.EASE_OUT, Constants.DAMPING_DURATION);
 	}
 
 	/**
@@ -272,7 +280,7 @@ export class CameraControls
 
 			if (this._pointer.triggerClickOnPointerUp)
 			{
-				//this.signals.click.dispatch({clientX: this._pointer.prevX, clientY: this._pointer.prevY});
+				this.signals.click.dispatch({clientX: this._pointer.prevX, clientY: this._pointer.prevY});
 			}
 		}
 
@@ -363,12 +371,12 @@ export class CameraControls
 		{
 			if (this._autoRotation[0] !== 0)
 			{
-				this._u.reset(this._u.end + this._autoRotation[0] * SceneManager.deltaFrame, this._u.end + this._autoRotation[0] * SceneManager.deltaFrame);
+				this._u.reset(this._u.end + this._autoRotation[0] * this._sceneManager.deltaFrame, this._u.end + this._autoRotation[0] * this._sceneManager.deltaFrame);
 			}
 
 			if (this._autoRotation[1] !== 0)
 			{
-				this._v.reset(this._v.end + this._autoRotation[1] * SceneManager.deltaFrame, this._v.end + this._autoRotation[1] * SceneManager.deltaFrame, undefined, undefined, true);
+				this._v.reset(this._v.end + this._autoRotation[1] * this._sceneManager.deltaFrame, this._v.end + this._autoRotation[1] * this._sceneManager.deltaFrame, undefined, undefined, true);
 			}
 
 			if (this._u.hasChangedSinceLastTick || this._v.hasChangedSinceLastTick)

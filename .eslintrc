@@ -1,0 +1,43 @@
+{
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"ecmaVersion": 2020
+	},
+	"extends": [
+		"plugin:import/errors",
+		"plugin:import/warnings",
+		"plugin:import/typescript"
+	],
+	"plugins": [
+		"import"
+	],
+	"rules": {
+		"brace-style": ["warn", "allman", {"allowSingleLine": true}],
+		"object-curly-spacing": [
+			"error",
+			"never"
+		],
+		"indent": [
+			"error",
+			"tab",
+			{
+				"SwitchCase": 1
+			}
+		],
+		"no-alert": [
+			"error"
+		],
+		"dot-location": [
+			"warn",
+			"property"
+		],
+		"import/no-cycle": "error",
+		"import/no-self-import": "error",
+		"no-duplicate-imports": [
+			"error",
+			{
+				"includeExports": true
+			}
+		]
+	}
+}
