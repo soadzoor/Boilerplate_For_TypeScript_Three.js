@@ -40,7 +40,7 @@ async function buildApp()
 			}
 			else
 			{
-				res = exec("tsc", `--incremental --composite false --tsBuildInfoFile ${BUILD_TEMP}/tsconfig.tsbuildinfo`);
+				res = exec("tsc", `--noEmit --incremental --composite false --tsBuildInfoFile ${BUILD_TEMP}/tsconfig.tsbuildinfo`);
 			}
 		}
 		catch (e)

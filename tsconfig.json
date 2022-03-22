@@ -7,8 +7,6 @@
     "importHelpers": true,
     "target": "es6",
     "allowJs": false,
-    "sourceMap": true,
-    "outDir": "build/prod/src",
     "strict": true,
     "noImplicitAny": true,
     "noImplicitOverride": true,
