@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src/ts/",
+    "noEmit": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "module": "esnext",

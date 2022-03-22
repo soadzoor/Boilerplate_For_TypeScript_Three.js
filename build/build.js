@@ -36,11 +36,11 @@ async function buildApp()
 		{
 			if (isProduction)
 			{
-				res = exec("tsc", "--noEmit");
+				res = exec("tsc");
 			}
 			else
 			{
-				res = exec("tsc", `--noEmit --incremental --composite false --tsBuildInfoFile ${BUILD_TEMP}/tsconfig.tsbuildinfo`);
+				res = exec("tsc", `--incremental --composite false --tsBuildInfoFile ${BUILD_TEMP}/tsconfig.tsbuildinfo`);
 			}
 		}
 		catch (e)
