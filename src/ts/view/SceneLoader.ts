@@ -1,5 +1,5 @@
 import {EquirectangularReflectionMapping, Group, Mesh, MeshStandardMaterial, Object3D, Texture, TextureLoader} from "three";
-import {GLTFLoader, GLTF} from "three/examples/jsm/loaders/GLTFLoader";
+import {GLTFLoader, GLTF} from "three/examples/jsm/loaders/GLTFLoader.js";
 
 export class SceneLoader
 {

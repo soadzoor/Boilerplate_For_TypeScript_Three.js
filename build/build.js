@@ -9,9 +9,16 @@ if (args.includes("--prod"))
 {
 	process.env.NODE_ENV = "production";
 }
+const splitCode = true; // for dynamic import (await import)
 const isProduction = process.env.NODE_ENV === "production";
 const buildFolder = isProduction ? BUILD_PROD : BUILD_DEV;
 const checkForTypeErrors = !args.includes("--fast");
+
+const yellowConsole = "\x1b[33m%s\x1b[0m";
+
+const timeStamp = getDateTime();
+let jsFile = "app.bundle.js";
+const jsSubFolder = "src";
 
 const {build} = require("esbuild");
 
@@ -23,7 +30,7 @@ async function buildApp()
 
 	if (checkForTypeErrors)
 	{
-		console.log("\x1b[33m%s\x1b[0m", "Looking for type errors...");
+		console.log(yellowConsole, "Looking for type errors...");
 
 		try
 		{
@@ -43,7 +50,7 @@ async function buildApp()
 		}
 	}
 
-	console.log("\x1b[33m%s\x1b[0m", "Copying static files...");
+	console.log(yellowConsole, "Copying static files...");
 
 	shx(`rm -rf ${buildFolder}`);
 	shx(`mkdir ${buildFolder}/`);
@@ -51,15 +58,65 @@ async function buildApp()
 
 	assets(buildFolder);
 
+
 	const promises = [
-		css(buildFolder),
-		buildJs(buildFolder)
+		buildJs(`${buildFolder}/${jsSubFolder}`),
+		css(buildFolder)
 	];
 
 	await Promise.all(promises);
 
+	console.log(yellowConsole, "Finalizing...");
+	
+	const methodsToDoAfterBundling = [];
+	let finalJsFullPath = "";
+	if (splitCode)
+	{
+		const originalJsFilePath = `${jsSubFolder}/App.js`;
+		const newJsFilePath = `${jsSubFolder}/App.${timeStamp}.js`;
+		finalJsFullPath = `${buildFolder}/${newJsFilePath}`;
+
+		methodsToDoAfterBundling.push(() =>
+		{
+			shx(`mv ${buildFolder}/${originalJsFilePath} ${finalJsFullPath}`);
+		});
+		await replaceTextInFile(`${buildFolder}/index.html`, `<script src="${jsSubFolder}/${jsFile}"></script>`, `<script type="module" src="${newJsFilePath}"></script>`);
+	}
+	else
+	{
+		const originalJsFile = jsFile;
+		jsFile = originalJsFile.replace(".js", `.${timeStamp}.js`);
+		finalJsFullPath = `${buildFolder}/${jsSubFolder}/${jsFile}`
+		await replaceTextInFile(`${buildFolder}/index.html`, `<script src="${jsSubFolder}/${originalJsFile}"></script>`, `<script src="${jsSubFolder}/${jsFile}"></script>`);
+	}
+
+	for (const methodToDo of methodsToDoAfterBundling)
+	{
+		methodToDo();
+	}
+
+
 	console.log("\x1b[32m%s\x1b[0m", "Build done!");
 	console.timeEnd("Build time");
+}
+
+function formatDateSegment(dateSegment /* number */)
+{
+	return `${dateSegment}`.length < 2 ? `0${dateSegment}` : `${dateSegment}`;
+}
+
+function getDateTime()
+{
+	const d = new Date();
+	let year = d.getFullYear();
+	let month = formatDateSegment(d.getMonth() + 1);
+	let day = formatDateSegment(d.getDate());
+
+	let hours = formatDateSegment(d.getHours());
+	let minutes = formatDateSegment(d.getMinutes());
+	let seconds = formatDateSegment(d.getSeconds());
+
+	return [year, month, day, hours, minutes, seconds].join("");
 }
 
 function shx(command)
@@ -106,7 +163,7 @@ function exec(command, args)
 
 function assets(buildFolder)
 {
-	console.log("\x1b[33m%s\x1b[0m", "Copying assets...");
+	console.log(yellowConsole, "Copying assets...");
 	shx(`rm -rf ${buildFolder}/assets`);
 	shx(`cp -R ${LOCAL_ROOT}/src/assets ${buildFolder}/assets`);
 }
@@ -156,26 +213,89 @@ async function replaceTextInFile(filePath, oldText, newText)
 
 function css(buildFolder)
 {
-	shx(`cp -R src/css ${buildFolder}/css`);
+	return new Promise(async (resolve, reject) =>
+	{
+		const sass = require("sass");
+
+		console.log(yellowConsole, "Creating CSS from SASS...");
+
+		const outFolder = `${buildFolder}/css`;
+		const originalFileName = `main.css`;
+		const timeStampedFileName = `main.${timeStamp}.css`;
+		const outFile = `${outFolder}/${timeStampedFileName}`;
+
+		try
+		{
+			const result = await sass.compileAsync(
+				`${LOCAL_ROOT}/src/sass/main.scss`,
+				{
+					sourceMap: !isProduction
+				}
+			);
+
+			shx(`mkdir ${outFolder}`);
+			const promises = [
+				writeTextFile(outFile, result.css)
+			];
+			if (result.map)
+			{
+				promises.push(
+					writeTextFile(`${outFile}.map`, result.map.toString())
+				);
+			}
+			await Promise.all(promises);
+
+			if (isProduction)
+			{
+				exec_module("uglifycss", `${outFile} --output ${outFile}`);
+			}
+
+			await replaceTextInFile(`${buildFolder}/index.html`, `css/${originalFileName}`, `css/${timeStampedFileName}`);
+
+			resolve();
+		}
+		catch (err)
+		{
+			console.error(err);
+			reject();
+		}
+	});
 }
 
 function buildJs(buildFolder)
 {
-	const jsFile = `${buildFolder}/js/app.bundle.js`;
+	const define = {}
+
+	// See these for explanation: https://github.com/evanw/esbuild/issues/69
+	// https://github.com/evanw/esbuild/issues/438
+	for (const k in process.env)
+	{
+		if (!k.includes("(") && !k.includes(")"))
+		{
+			define[`process.env.${k}`] = JSON.stringify(process.env[k])
+		}
+	}
 
 	const options = {
-		entryPoints: ["./src/ts/Main.ts"],
+		entryPoints: ["./src/ts/App.ts"],
 		target: "es2017",
 		minify: isProduction,
 		sourcemap: !isProduction,
 		bundle: true,
-		//splitting: true, // for dynamic import (await import)
-		//outdir: buildFolder,
-		outfile: jsFile,
-		//format: "esm"
+		splitting: splitCode,
+		outfile: `${buildFolder}/${jsFile}`,
+		define: define,
+		treeShaking: true
 	};
 
-	console.log("\x1b[33m%s\x1b[0m", "Bundling js...");
+	if (splitCode)
+	{
+		delete options.outfile;
+		options.outdir = `${buildFolder}`;
+		options.format = "esm";
+	}
+
+	console.log(yellowConsole, "Bundling js...");
 
 	return build(options);
 }

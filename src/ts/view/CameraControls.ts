@@ -104,7 +104,7 @@ export class CameraControls
 		return distance;
 	}
 
-	private onWheel = (event: MouseWheelEvent) =>
+	private onWheel = (event: WheelEvent) =>
 	{
 		event.preventDefault();
 		const zoomStepSize = 1.1;

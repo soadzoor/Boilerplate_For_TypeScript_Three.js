@@ -1,21 +1,13 @@
 import {SceneManager} from "./view/SceneManager";
 import {Model} from "./model/Model";
 
-export class Main
+export class App
 {
-	public static instance: Main;
-	public static getInstance(): Main
-	{
-		return Main.instance || new Main();
-	}
-
 	private _model: Model;
 	private _sceneManager: SceneManager;
 
 	constructor()
 	{
-		Main.instance = this;
-
 		this._model = new Model();
 		this._sceneManager = new SceneManager();
 	}
@@ -31,4 +23,4 @@ export class Main
 	}
 }
 
-const main = Main.getInstance();
+const app = new App();

@@ -1,4 +1,4 @@
-import {Scene, PerspectiveCamera, WebGLRenderer, AmbientLight, DirectionalLight, HemisphereLight, GammaEncoding} from "three";
+import {Scene, PerspectiveCamera, WebGLRenderer, AmbientLight, DirectionalLight, HemisphereLight, sRGBEncoding} from "three";
 import {CameraControls} from "./CameraControls";
 import {SceneLoader} from "./SceneLoader";
 import {VignetteBackground} from "./VignetteBackground";
@@ -86,7 +86,7 @@ export class SceneManager
 		});
 		this._renderer.setPixelRatio(window.devicePixelRatio);
 		this._renderer.setClearColor(0xECF8FF);
-		this._renderer.outputEncoding = GammaEncoding;
+		this._renderer.outputEncoding = sRGBEncoding;
 
 		this._canvas.addEventListener("webglcontextlost", this.onContextLost);
 
