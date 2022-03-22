@@ -5,12 +5,14 @@
     "moduleResolution": "node",
     "module": "esnext",
     "importHelpers": true,
-    "target": "es5",
-    "allowJs": true,
+    "target": "es6",
+    "allowJs": false,
     "sourceMap": true,
     "outDir": "build/prod/src",
-    "noImplicitAny": false,
-    "strictBindCallApply": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "skipLibCheck": true,
     "types": [
       "node"
     ],

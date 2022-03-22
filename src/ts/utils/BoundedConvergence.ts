@@ -4,8 +4,6 @@ import {Constants} from "./Constants";
 
 export class BoundedConvergence extends Convergence
 {
-	protected _min: number;
-	protected _max: number;
 	private _originalMax: number;
 	private _originalMin: number;
 
@@ -54,7 +52,7 @@ export class BoundedConvergence extends Convergence
 		super.reset(newStart, newEnd);
 	}
 
-	public reset(start?: number, end?: number, min?: number, max?: number, clampBetweenMinAndMax: boolean = false)
+	public override reset(start?: number, end?: number, min?: number, max?: number, clampBetweenMinAndMax: boolean = false)
 	{
 		this._min = min != null ? min : this._min;
 		this._max = max != null ? max : this._max;

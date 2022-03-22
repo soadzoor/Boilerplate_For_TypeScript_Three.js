@@ -1,4 +1,5 @@
 import {Mesh, PlaneBufferGeometry, RawShaderMaterial, FrontSide, Vector2, Color} from "three";
+import {SceneManager} from "./SceneManager";
 
 /**Based on https://github.com/mattdesl/three-vignette-background */
 
@@ -23,28 +24,28 @@ export class VignetteBackground
 				offset: {value: new Vector2(0, 0)},
 				scale: {value: new Vector2(1, 1)},
 				smooth: {value: new Vector2(0.0, 1.0)},
-				color1: {value: new Color('#fff')},
-				color2: {value: new Color('#283844')}
+				color1: {value: new Color("#fff")},
+				color2: {value: new Color("#283844")}
 			},
 			depthTest: false
 		});
-		const mesh = <any>(new Mesh(geometry, material));
+		const mesh = new Mesh(geometry, material) as any;
 		mesh.frustumCulled = false;
-		(<any>mesh).style = style;
+		mesh.style = style;
 		if (opt)
 		{
 			mesh.style(opt);
 		}
 		this._mesh = mesh;
 
-		function style(opt)
+		function style(opt: Record<string, any>)
 		{
 			opt = opt || {};
 			if (Array.isArray(opt.colors))
 			{
 				const colors = opt.colors.map(function (c)
 				{
-					if (typeof c === 'string' || typeof c === 'number')
+					if (typeof c === "string" || typeof c === "number")
 					{
 						return new Color(<number>c)
 					}
@@ -53,15 +54,15 @@ export class VignetteBackground
 				material.uniforms.color1.value.copy(colors[0]);
 				material.uniforms.color2.value.copy(colors[1]);
 			}
-			if (typeof opt.aspect === 'number')
+			if (typeof opt.aspect === "number")
 			{
 				material.uniforms.aspect.value = opt.aspect;
 			}
-			if (typeof opt.grainScale === 'number')
+			if (typeof opt.grainScale === "number")
 			{
 				material.uniforms.grainScale.value = opt.grainScale;
 			}
-			if (typeof opt.grainTime === 'number')
+			if (typeof opt.grainTime === "number")
 			{
 				material.uniforms.grainTime.value = opt.grainTime;
 			}
@@ -75,27 +76,27 @@ export class VignetteBackground
 				var offset = fromArray(opt.offset, Vector2);
 				material.uniforms.offset.value.copy(offset);
 			}
-			if (typeof opt.noiseAlpha === 'number')
+			if (typeof opt.noiseAlpha === "number")
 			{
 				material.uniforms.noiseAlpha.value = opt.noiseAlpha;
 			}
-			if (typeof opt.scale !== 'undefined')
+			if (typeof opt.scale !== "undefined")
 			{
 				var scale = opt.scale;
-				if (typeof scale === 'number')
+				if (typeof scale === "number")
 				{
 					scale = [scale, scale];
 				}
 				scale = fromArray(scale, Vector2);
 				material.uniforms.scale.value.copy(scale);
 			}
-			if (typeof opt.aspectCorrection !== 'undefined')
+			if (typeof opt.aspectCorrection !== "undefined")
 			{
 				material.uniforms.aspectCorrection.value = Boolean(opt.aspectCorrection);
 			}
 		}
 
-		const fromArray = (array, VectorType) =>
+		const fromArray = (array: number[], VectorType: typeof Vector2) =>
 		{
 			if (Array.isArray(array))
 			{

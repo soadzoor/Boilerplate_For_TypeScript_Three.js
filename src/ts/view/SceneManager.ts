@@ -26,6 +26,19 @@ export class SceneManager
 		this._scene = new Scene();
 		this._camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.05, 70);
 
+		this._controls = new CameraControls(this._canvas, this);
+
+		const contextAttributes = {
+			alpha: true,
+			antialias: true
+		};
+		const context = this._canvas.getContext("webgl2", contextAttributes) || this._canvas.getContext("experimental-webgl2", contextAttributes);
+		this._renderer = new WebGLRenderer({
+			canvas: this._canvas,
+			context: context as WebGL2RenderingContext,
+			...contextAttributes
+		});
+
 		this.init();
 	}
 
@@ -63,7 +76,6 @@ export class SceneManager
 
 	private initControls()
 	{
-		this._controls = new CameraControls(this._canvas.parentElement, this);
 		this._controls.activate();
 	}
 
@@ -74,16 +86,6 @@ export class SceneManager
 
 	private initRenderer()
 	{
-		const contextAttributes = {
-			alpha: true,
-			antialias: true
-		};
-		const context = this._canvas.getContext("webgl2", contextAttributes) || this._canvas.getContext("experimental-webgl2", contextAttributes);
-		this._renderer = new WebGLRenderer({
-			canvas: this._canvas,
-			context: context as WebGL2RenderingContext,
-			...contextAttributes
-		});
 		this._renderer.setPixelRatio(window.devicePixelRatio);
 		this._renderer.setClearColor(0xECF8FF);
 		this._renderer.outputEncoding = sRGBEncoding;

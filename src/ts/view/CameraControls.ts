@@ -21,17 +21,17 @@ export class CameraControls
 		downTimeStamp: number;
 		startX: number;
 		startY: number;
-		prevX: number;
-		prevY: number;
+		prevX: number | null;
+		prevY: number | null;
 		prevDeltaX: number;
 		prevDeltaY: number;
 		prevTimeStamp: number;
 		prevDeltaTime: number;
 		triggerClickOnPointerUp: boolean;
 	} = {
-		downTimeStamp: null,
-		startX: null,
-		startY: null,
+		downTimeStamp: -1,
+		startX: -1,
+		startY: -1,
 		prevX: null,
 		prevY: null,
 		prevDeltaX: 0,
@@ -53,16 +53,16 @@ export class CameraControls
 		};
 	} = {
 		startValue: {
-			touchDistance: null,
-			distanceValue: null
+			touchDistance: -1,
+			distanceValue: -1
 		},
 		currentValue: {
-			touchDistance: null,
-			distanceValue: null
+			touchDistance: -1,
+			distanceValue: -1
 		}
 	};
 	private _cameraNormalizedPosition: number[] = VectorUtils.normalize([-1, 0.3, 0]);
-	private _timeoutId: number = null;
+	private _timeoutId: number = -1;
 	private _dampOnPointerUp: boolean = false;
 
 	private _enabled: boolean = false;
@@ -278,9 +278,9 @@ export class CameraControls
 
 		this._isPointerDown = false;
 		this._pointer.triggerClickOnPointerUp = false;
-		this._pointer.downTimeStamp = null;
-		this._pointer.startX = null;
-		this._pointer.startY = null;
+		this._pointer.downTimeStamp = -1;
+		this._pointer.startX = -1;
+		this._pointer.startY = -1;
 		this._pointer.prevX = null;
 		this._pointer.prevY = null;
 		this._pointer.prevTimeStamp = 0;
@@ -289,7 +289,7 @@ export class CameraControls
 		this._pointer.prevDeltaTime = 1;
 
 		this._pinch.startValue.touchDistance = this._pinch.startValue.distanceValue =
-			this._pinch.currentValue.touchDistance = this._pinch.currentValue.distanceValue = null;
+			this._pinch.currentValue.touchDistance = this._pinch.currentValue.distanceValue = -1;
 	};
 
 	private cancelDamping = () =>
@@ -378,8 +378,8 @@ export class CameraControls
 				this._cameraNormalizedPosition = VectorUtils.getWorldPositionFromUV(this._u.value, this._v.value);
 				this._sceneManager.needsRender = true;
 			}
-
-			return this._cameraNormalizedPosition;
 		}
+
+		return this._cameraNormalizedPosition;
 	}
 }
