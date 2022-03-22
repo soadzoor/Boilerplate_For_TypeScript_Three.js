@@ -75,7 +75,7 @@ export class SceneManager
 	private initRenderer()
 	{
 		const contextAttributes = {
-			alpha: false,
+			alpha: true,
 			antialias: true
 		};
 		const context = this._canvas.getContext("webgl2", contextAttributes) || this._canvas.getContext("experimental-webgl2", contextAttributes);
