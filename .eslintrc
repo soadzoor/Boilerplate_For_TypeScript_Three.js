@@ -37,6 +37,15 @@
 			"error",
 			"always"
 		],
+		"no-trailing-spaces": "error",
+		"space-before-function-paren": [
+			"error",
+			{
+				"anonymous": "always",
+				"named": "never",
+				"asyncArrow": "always"
+			}
+		],
 		"linebreak-style": [
 			"error",
 			"windows"
