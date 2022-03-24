@@ -9,8 +9,8 @@
   "scripts": {
     "start": "node build/start",
     "eslint:report": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --report-unused-disable-directives",
-    "eslint:fix": "npm run eslint:report --fix",
-    "build": "node build/build",
+    "eslint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --report-unused-disable-directives --fix",
+    "build:dev": "node build/build",
     "build:prod": "node build/build --prod"
   },
   "repository": {

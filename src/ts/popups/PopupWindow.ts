@@ -23,7 +23,7 @@ interface IPopupWindowProps
 export abstract class PopupWindow<T>
 {
 	private static _instances: PopupWindow<any>[] = [];
-	private static _lastStateId = 1
+	private static _lastStateId = 1;
 	private _isOkButtonEnabled: boolean = true;
 	private _container: HTMLDivElement = document.createElement("div");
 	private _okButton: HTMLDivElement = document.createElement("div");

@@ -46,9 +46,9 @@ export class VignetteBackground
 				{
 					if (typeof c === "string" || typeof c === "number")
 					{
-						return new Color(<number>c)
+						return new Color(c);
 					}
-					return c
+					return c;
 				});
 				material.uniforms.color1.value.copy(colors[0]);
 				material.uniforms.color2.value.copy(colors[1]);
@@ -102,7 +102,7 @@ export class VignetteBackground
 				return new VectorType().fromArray(array);
 			}
 			return array;
-		}
+		};
 	}
 
 	public get mesh()
