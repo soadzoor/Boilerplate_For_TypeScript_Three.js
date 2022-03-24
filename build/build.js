@@ -80,7 +80,7 @@ async function buildApp()
 		{
 			shx(`mv ${buildFolder}/${originalJsFilePath} ${finalJsFullPath}`);
 		});
-		await replaceTextInFile(`${buildFolder}/index.html`, `<script type="module" src="ts/${jsFile}"></script>`, `<script type="module" src="${newJsFilePath}"></script>`);
+		await replaceTextInFile(`${buildFolder}/index.html`, `<script type="module" src="./ts/${jsFile}"></script>`, `<script type="module" src="${newJsFilePath}"></script>`);
 	}
 	else
 	{
@@ -317,7 +317,7 @@ function css(buildFolder)
 				exec_module("uglifycss", `${outFile} --output ${outFile}`);
 			}
 
-			await replaceTextInFile(`${buildFolder}/index.html`, `sass/${originalFileName}`, `css/${timeStampedFileName}`);
+			await replaceTextInFile(`${buildFolder}/index.html`, `./sass/${originalFileName}`, `./css/${timeStampedFileName}`);
 
 			resolve();
 		}

@@ -3,6 +3,18 @@
 	"parserOptions": {
 		"ecmaVersion": 2020
 	},
+	"settings": {
+		"import/resolver": {
+			"node": {
+				"extensions": [
+					".js",
+					".jsx",
+					".ts",
+					".tsx"
+				]
+			}
+		}
+	},
 	"extends": [
 		"plugin:import/errors",
 		"plugin:import/warnings",
@@ -12,6 +24,8 @@
 		"import"
 	],
 	"rules": {
+		// We're using typescript's resolver
+		"import/no-unresolved": "off",
 		"eol-last": [
 			"error",
 			"always"
@@ -28,7 +42,13 @@
 				"maxBOF": 0
 			}
 		],
-		"brace-style": ["warn", "allman", {"allowSingleLine": true}],
+		"brace-style": [
+			"warn",
+			"allman",
+			{
+				"allowSingleLine": true
+			}
+		],
 		"object-curly-spacing": [
 			"error",
 			"never"
