@@ -6,6 +6,7 @@
   "directories": {
     "doc": "docs"
   },
+  "type": "module",
   "scripts": {
     "start": "node build/start",
     "build:dev": "node build/build",
@@ -22,7 +23,7 @@
   "license": "ISC",
   "lint-staged": {
     "*.{ts,tsx}": [
-      "npx tsc -p tsconfig.json",
+      "bash -c tsc -p tsconfig.json",
       "eslint --ext .js,.jsx,.ts,.tsx src --report-unused-disable-directives --max-warnings 0"
     ]
   },
@@ -35,7 +36,9 @@
     "@typescript-eslint/eslint-plugin": "5.16.0",
     "esbuild": "0.14.27",
     "eslint": "8.11.0",
+    "eslint-import-resolver-typescript": "2.7.0",
     "eslint-plugin-import": "2.25.4",
+    "eslint-plugin-unused-imports": "2.0.0",
     "husky": "7.0.4",
     "lint-staged": "12.3.7",
     "sass": "1.49.9",

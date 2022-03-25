@@ -1,9 +1,13 @@
+import child_process from "child_process";
+import fs from "fs";
+import {build} from "esbuild";
+import sass from "sass";
+
 const LOCAL_ROOT = ".";
 const BUILD_DEV = "build/dev";
 const BUILD_PROD = "build/prod";
 const BUILD_TEMP = "build/temp";
 const NODE_MODULES_PATH = "./node_modules";
-const fs = require("fs"); // it's included in node.js by default, no need for any additional packages
 const args = process.argv.slice(2);
 if (args.includes("--prod"))
 {
@@ -20,8 +24,6 @@ const timeStamp = getDateTime();
 let jsFile = "App.ts";
 const jsSubFolder = "src";
 
-const {build} = require("esbuild");
-
 buildApp();
 
 async function buildApp()
@@ -36,11 +38,11 @@ async function buildApp()
 		{
 			if (isProduction)
 			{
-				res = exec("tsc");
+				exec("tsc");
 			}
 			else
 			{
-				res = exec("tsc", `--incremental --composite false --tsBuildInfoFile ${BUILD_TEMP}/tsconfig.tsbuildinfo`);
+				exec("tsc", `--incremental --composite false --tsBuildInfoFile ${BUILD_TEMP}/tsconfig.tsbuildinfo`);
 			}
 		}
 		catch (e)
@@ -217,7 +219,7 @@ function exec(command, args)
 	let result;
 	try
 	{
-		result = require("child_process").execSync(command + " " + args, {stdio: stdio});
+		result = child_process.execSync(command + " " + args, {stdio: stdio});
 	}
 	catch (e)
 	{
@@ -282,8 +284,6 @@ function css(buildFolder)
 {
 	return new Promise(async (resolve, reject) =>
 	{
-		const sass = require("sass");
-
 		console.log(yellowConsole, "Creating CSS from SASS...");
 
 		const outFolder = `${buildFolder}/css`;

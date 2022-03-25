@@ -3,7 +3,7 @@ import {BoundedConvergence} from "../utils/BoundedConvergence";
 import {Constants} from "../utils/Constants";
 import {Easing} from "../utils/Convergence";
 import {VectorUtils} from "../utils/VectorUtils";
-import {ISceneManager} from "./SceneManagerType";
+import type {ISceneManager} from "./SceneManagerType";
 
 export class CameraControls
 {
@@ -87,8 +87,8 @@ export class CameraControls
 
 	/**
 	 * Returns the distance between 2 touch points
-	 * @param touch0 
-	 * @param touch1 
+	 * @param touch0
+	 * @param touch1
 	 */
 	private getTouchDistance(event: TouchEvent)
 	{

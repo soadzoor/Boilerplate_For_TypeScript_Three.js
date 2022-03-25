@@ -1,4 +1,4 @@
-import {ISceneManager} from "../view/SceneManagerType";
+import type {ISceneManager} from "../view/SceneManagerType";
 import {Convergence, Easing} from "./Convergence";
 import {MathUtils} from "./MathUtils";
 import {Constants} from "./Constants";

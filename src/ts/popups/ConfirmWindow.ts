@@ -4,6 +4,7 @@ import {IPopupWindowConfig, PopupWindow} from "./PopupWindow";
 /**
  * Can be used as an alternative for `confirm("confirmMessage");`
  */
+// eslint-disable-next-line import/no-unused-modules
 export class ConfirmWindow extends PopupWindow<boolean>
 {
 	protected _okValue = true;

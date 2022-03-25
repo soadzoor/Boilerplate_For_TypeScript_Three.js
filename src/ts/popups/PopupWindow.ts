@@ -38,7 +38,7 @@ export abstract class PopupWindow<T>
 	protected abstract _okValue: T; // the return value when the user clicks "ok"
 	protected abstract _cancelValue: T; // the return value when the user clicks "cancel"
 	protected _additionalElements: HTMLElement | null = null;
-	protected resolve: (isOk: T | PromiseLike<T>) => void = () => {};
+	protected resolve: (isOk: T | PromiseLike<T>) => void = () => { /* */ };
 
 	constructor(props: IPopupWindowProps)
 	{

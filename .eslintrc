@@ -5,6 +5,7 @@
 	},
 	"settings": {
 		"import/resolver": {
+			"typescript": {},
 			"node": {
 				"extensions": [
 					".js",
@@ -22,7 +23,8 @@
 	],
 	"plugins": [
 		"import",
-		"@typescript-eslint"
+		"@typescript-eslint",
+		"unused-imports"
 	],
 	"rules": {
 		"@typescript-eslint/consistent-type-assertions": [
@@ -48,7 +50,7 @@
 		],
 		"linebreak-style": [
 			"error",
-			"windows"
+			"unix"
 		],
 		"no-multiple-empty-lines": [
 			"error",
@@ -94,12 +96,20 @@
 		],
 		"import/no-cycle": "error",
 		"import/no-self-import": "error",
-		"no-duplicate-imports": [
+		"import/no-duplicates": "error",
+		"import/order": "error",
+		"import/no-unused-modules": [
 			"error",
 			{
-				"includeExports": true
+				"unusedExports": true,
+				"missingExports": true
 			}
 		],
+		"import/no-extraneous-dependencies": "error",
+		"unused-imports/no-unused-imports": "error",
+		"no-multi-spaces": "error",
+		"no-empty-function": "error",
+		"keyword-spacing": "error",
 		"semi": [
 			"error",
 			"always"

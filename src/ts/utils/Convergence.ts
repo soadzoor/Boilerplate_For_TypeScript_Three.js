@@ -1,6 +1,6 @@
-import {ISceneManager} from "../view/SceneManagerType";
+import type {ISceneManager} from "../view/SceneManagerType";
 import {Constants} from "./Constants";
-import {IConvergence} from "./ConvergenceType";
+import type {IConvergence} from "./ConvergenceType";
 import {MathUtils} from "./MathUtils";
 
 /** This class is mainly for animating anything seamlessly and smoothly.

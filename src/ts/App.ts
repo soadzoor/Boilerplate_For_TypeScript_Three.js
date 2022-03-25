@@ -5,4 +5,5 @@ function App()
 	const scene = new SceneManager();
 }
 
-const app = App();
+// eslint-disable-next-line import/no-unused-modules
+export const app = App();

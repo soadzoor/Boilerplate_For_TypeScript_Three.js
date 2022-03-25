@@ -6,7 +6,7 @@ import {Constants} from "../utils/Constants";
 import {CameraControls} from "./CameraControls";
 import {SceneLoader} from "./SceneLoader";
 import {VignetteBackground} from "./VignetteBackground";
-import {ISceneManager} from "./SceneManagerType";
+import type {ISceneManager} from "./SceneManagerType";
 
 export default class SceneManager implements ISceneManager
 {

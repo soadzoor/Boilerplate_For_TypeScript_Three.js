@@ -1,4 +1,4 @@
-import {IConvergence} from "../utils/ConvergenceType";
+import type {IConvergence} from "../utils/ConvergenceType";
 
 export interface ISceneManager
 {

@@ -9,6 +9,7 @@ interface IPromptWindowConfig extends IPopupWindowConfig
 /**
  * Can be used as an alternative for `prompt("alertMessage");`
  */
+// eslint-disable-next-line import/no-unused-modules
 export class PromptWindow extends PopupWindow<string>
 {
 	protected static override readonly _defaultConfig: IPromptWindowConfig = {

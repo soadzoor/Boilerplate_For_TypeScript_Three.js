@@ -16,7 +16,7 @@ interface IBinding<T>
 	priority: number
 }
 
-export class Signal<T> implements ISignal<T> 
+export class Signal<T> implements ISignal<T>
 {
 	// --------------------------------------------------------------------------------------------------
 	// static create method
@@ -45,12 +45,12 @@ export class Signal<T> implements ISignal<T>
 	// --------------------------------------------------------------------------------------------------
 	// add methods
 
-	
+
 	public add(listener: (p1: T) => any, context?: any, priority = 0): void
 	{
 		this.registerListener(listener, false, context, priority);
 	}
-	
+
 	protected registerListener(listener: (p1: T) => any, isOnce: boolean, context: any, priority = 0): void
 	{
 		const prevIndex = this.indexOfListener(listener, context);
@@ -62,10 +62,10 @@ export class Signal<T> implements ISignal<T>
 			if (binding.isOnce !== isOnce)
 			{
 				throw new Error(
-					`You cannot add${ 
-						isOnce ? "" : "Once" 
-					}() then add${ 
-						!isOnce ? "" : "Once" 
+					`You cannot add${
+						isOnce ? "" : "Once"
+					}() then add${
+						!isOnce ? "" : "Once"
 					}() the same listener without removing the relationship first.`
 				);
 			}
@@ -97,7 +97,7 @@ export class Signal<T> implements ISignal<T>
 		//if (this._highestPriority < binding.pr)
 	}
 
-	
+
 	protected indexOfListener(listener: (p1: T) => any, context: any): number
 	{
 		for (let i = this._bindings.length - 1; i >= 0; --i)
@@ -126,7 +126,7 @@ export class Signal<T> implements ISignal<T>
 	 *
 	 * TODO return listener?
 	 */
-	
+
 	public remove(listener: (p1: T) => any, context?: any): boolean
 	{
 		const i = this.indexOfListener(listener, context);

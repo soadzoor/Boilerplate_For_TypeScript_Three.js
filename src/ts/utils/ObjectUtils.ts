@@ -30,7 +30,7 @@ export class ObjectUtils
 	/**
 	 * Checks if 2 objects equal each other, ie. they have the same
 	 * fields and values (recursively).
-	 * 
+	 *
 	 * JSON.stringify(obj1) === JSON.stringify(obj1) is not working when there's a loop in the structure (circular structure)
 	 */
 	static compare(object1: any, object2: any): boolean
