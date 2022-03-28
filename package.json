@@ -24,7 +24,7 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "bash -c tsc -p tsconfig.json",
-      "eslint --ext .js,.jsx,.ts,.tsx src --report-unused-disable-directives --max-warnings 0"
+      "eslint --fix"
     ]
   },
   "dependencies": {
