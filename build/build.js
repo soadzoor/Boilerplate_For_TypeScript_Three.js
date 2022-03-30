@@ -1,7 +1,9 @@
-import child_process from "child_process";
 import fs from "fs";
-import {build} from "esbuild";
+import child_process from "child_process";
+import esbuild from "esbuild";
 import sass from "sass";
+
+const {build} = esbuild;
 
 const LOCAL_ROOT = ".";
 const BUILD_DEV = "build/dev";
