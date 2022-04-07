@@ -28,11 +28,11 @@
     ]
   },
   "dependencies": {
-    "three": "0.138.3"
+    "three": "0.139.2"
   },
   "devDependencies": {
     "@types/node": "17.0.22",
-    "@types/three": "0.138.0",
+    "@types/three": "0.139.0",
     "@typescript-eslint/eslint-plugin": "5.16.0",
     "esbuild": "0.14.27",
     "eslint": "8.11.0",

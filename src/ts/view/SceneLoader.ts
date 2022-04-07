@@ -1,4 +1,5 @@
-import {EquirectangularReflectionMapping, Group, Mesh, MeshStandardMaterial, Object3D, Texture, TextureLoader} from "three";
+import {EquirectangularReflectionMapping, TextureLoader} from "three";
+import type {Group, Mesh, MeshStandardMaterial, Object3D, Texture} from "three";
 import {GLTF, GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader.js";
 
 export class SceneLoader
@@ -26,9 +27,10 @@ export class SceneLoader
 			{
 				gltf.scene.traverse((object: Object3D) =>
 				{
-					if (object instanceof Mesh)
+					const objectAsMesh = object as Mesh;
+					if (objectAsMesh.isMesh)
 					{
-						const material = object.material as MeshStandardMaterial;
+						const material = objectAsMesh.material as MeshStandardMaterial;
 						if (material.envMap === null)
 						{
 							material.envMap = this.envMap;
