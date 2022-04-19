@@ -1,6 +1,7 @@
 {
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
+		"project": ["./tsconfig.json"],
 		"ecmaVersion": 2020
 	},
 	"settings": {
@@ -33,6 +34,13 @@
 				"assertionStyle": "as"
 			}
 		],
+		"@typescript-eslint/consistent-type-imports": [
+			"error",
+			{
+				"prefer": "type-imports"
+			}
+		],
+		"@typescript-eslint/await-thenable": "error",
 		// We're using typescript's resolver
 		"import/no-unresolved": "off",
 		"eol-last": [

@@ -1,5 +1,6 @@
 import {ObjectUtils} from "../utils/ObjectUtils";
-import {IPopupWindowConfig, PopupWindow} from "./PopupWindow";
+import type {IPopupWindowConfig} from "./PopupWindow";
+import {PopupWindow} from "./PopupWindow";
 
 interface IPromptWindowConfig extends IPopupWindowConfig
 {

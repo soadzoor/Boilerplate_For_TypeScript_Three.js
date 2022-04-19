@@ -1,6 +1,7 @@
 import {ObjectUtils} from "../utils/ObjectUtils";
 
-import {IPopupWindowConfig, PopupWindow} from "./PopupWindow";
+import type {IPopupWindowConfig} from "./PopupWindow";
+import {PopupWindow} from "./PopupWindow";
 
 /**
  * Can be used as an alternative for `alert("alertMessage");`
