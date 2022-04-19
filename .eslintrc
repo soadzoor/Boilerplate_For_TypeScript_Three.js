@@ -87,6 +87,11 @@
 				"SwitchCase": 1
 			}
 		],
+		"template-curly-spacing": [
+			"error",
+			"never"
+		],
+		"require-await": "error",
 		"no-alert": [
 			"error"
 		],

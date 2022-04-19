@@ -11,7 +11,7 @@
     "start": "node build/start",
     "build:dev": "node build/build",
     "build:prod": "node build/build --prod",
-    "eslint:report": "eslint --ext .js,.jsx,.ts,.tsx src --report-unused-disable-directives --max-warnings 0",
+    "eslint:report": "eslint --ext .js,.jsx,.ts,.tsx src --report-unused-disable-directives --max-warnings 0 --cache",
     "eslint:fix": "npm run eslint:report -- --fix",
     "install git hooks": "husky install"
   },
