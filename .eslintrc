@@ -41,6 +41,19 @@
 			}
 		],
 		"@typescript-eslint/await-thenable": "error",
+		"@typescript-eslint/type-annotation-spacing": [
+			"error",
+			{
+				"before": false,
+				"after": true,
+				"overrides": {
+					"arrow": {
+						"before": true,
+						"after": true
+					}
+				}
+			}
+		],
 		// We're using typescript's resolver
 		"import/no-unresolved": "off",
 		"eol-last": [
