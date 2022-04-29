@@ -32,15 +32,9 @@ export default class SceneManager implements ISceneManager
 
 		this._controls = new CameraControls(this._canvas.parentElement!, this);
 
-		const contextAttributes = {
-			alpha: true,
-			antialias: true
-		};
-		const context = this._canvas.getContext("webgl2", contextAttributes) || this._canvas.getContext("experimental-webgl2", contextAttributes);
 		this._renderer = new WebGLRenderer({
 			canvas: this._canvas,
-			context: context as WebGL2RenderingContext,
-			...contextAttributes
+			antialias: true,
 		});
 
 		this.init();
