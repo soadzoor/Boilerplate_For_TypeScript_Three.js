@@ -61,6 +61,7 @@
 			"always"
 		],
 		"no-trailing-spaces": "error",
+		"space-infix-ops": "error",
 		"space-before-function-paren": [
 			"error",
 			{
