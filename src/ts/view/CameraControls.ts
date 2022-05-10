@@ -13,7 +13,7 @@ export class CameraControls
 	private _mouseMoved: boolean = true;
 	private _triggerClickThreshold: {
 		deltaCursor: number;
-		deltaTime: number
+		deltaTime: number;
 	} = {
 			deltaCursor: 3,
 			deltaTime: 1000
@@ -73,7 +73,7 @@ export class CameraControls
 	private _prevSpeed: number[] = [];
 
 	public signals = {
-		click: Signal.create<{clientX: number, cientY: number}>()
+		click: Signal.create<{clientX: number; cientY: number}>()
 	};
 
 	constructor(domElement: HTMLElement, sceneManager: ISceneManager)

@@ -28,6 +28,8 @@
 		"unused-imports"
 	],
 	"rules": {
+		// We're using typescript's resolver
+		"import/no-unresolved": "off",
 		"@typescript-eslint/consistent-type-assertions": [
 			"error",
 			{
@@ -54,8 +56,20 @@
 				}
 			}
 		],
-		// We're using typescript's resolver
-		"import/no-unresolved": "off",
+		"@typescript-eslint/member-delimiter-style": [
+			"error",
+			{
+				"multiline": {
+					"delimiter": "semi",
+					"requireLast": true
+				},
+				"singleline": {
+					"delimiter": "semi",
+					"requireLast": false
+				},
+				"multilineDetection": "brackets"
+			}
+		],
 		"eol-last": [
 			"error",
 			"always"

@@ -1,19 +1,19 @@
 interface ISignal<T>
 {
-	add(listener: (p1: T) => any, listenerContext?: any): void
-	remove(listener: () => any, listenerContext?: any): boolean
-	removeAll(): void
-	halt(): void
-	dispatch(...args: any[]): void
-	bindings: IBinding<T>[]
+	add(listener: (p1: T) => any, listenerContext?: any): void;
+	remove(listener: () => any, listenerContext?: any): boolean;
+	removeAll(): void;
+	halt(): void;
+	dispatch(...args: any[]): void;
+	bindings: IBinding<T>[];
 }
 
 interface IBinding<T>
 {
-	listener: (p1: T) => any
-	context?: any
-	isOnce: boolean
-	priority: number
+	listener: (p1: T) => any;
+	context?: any;
+	isOnce: boolean;
+	priority: number;
 }
 
 export class Signal<T> implements ISignal<T>
