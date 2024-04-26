@@ -1,4 +1,4 @@
-import {AmbientLight, DirectionalLight, HemisphereLight, PerspectiveCamera, Scene, WebGLRenderer, sRGBEncoding} from "three";
+import {AmbientLight, DirectionalLight, HemisphereLight, PerspectiveCamera, Scene, WebGLRenderer} from "three";
 import {WarningWindow} from "../popups/WarningWindow";
 import {Convergence, Easing} from "../utils/Convergence";
 import {BoundedConvergence} from "../utils/BoundedConvergence";
@@ -86,7 +86,6 @@ export default class SceneManager implements ISceneManager
 	{
 		this._renderer.setPixelRatio(window.devicePixelRatio);
 		this._renderer.setClearColor(0xECF8FF);
-		this._renderer.outputEncoding = sRGBEncoding;
 
 		this._canvas.addEventListener("webglcontextlost", this.onContextLost);
 

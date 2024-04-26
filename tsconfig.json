@@ -8,7 +8,7 @@
     "target": "es6",
     "allowJs": false,
     "strict": true,
-    "importsNotUsedAsValues": "error",
+    "verbatimModuleSyntax": true,
     "noImplicitAny": true,
     "noImplicitOverride": true,
     "skipLibCheck": true,
