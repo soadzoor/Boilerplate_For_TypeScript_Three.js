@@ -6,22 +6,19 @@
 import {ObjectUtils} from "../utils/ObjectUtils";
 import {KeyboardListener} from "../utils/KeyboardListener";
 
-export interface IPopupWindowConfig
-{
+export interface IPopupWindowConfig {
 	backdrop?: boolean;
 	ok?: string; // The label of the OK button
 	cancel?: string; // The label of the Cancel button
 	parentElement?: HTMLElement;
 }
 
-interface IPopupWindowProps
-{
+interface IPopupWindowProps {
 	message: string;
 	config?: IPopupWindowConfig;
 }
 
-export abstract class PopupWindow<T>
-{
+export abstract class PopupWindow<T> {
 	private static _instances: PopupWindow<any>[] = [];
 	private static _lastStateId = 1;
 	private _isOkButtonEnabled: boolean = true;
@@ -33,28 +30,26 @@ export abstract class PopupWindow<T>
 		backdrop: true,
 		ok: "Yes",
 		cancel: "No",
-		parentElement: document.body
+		parentElement: document.body,
 	};
 	protected abstract _okValue: T; // the return value when the user clicks "ok"
 	protected abstract _cancelValue: T; // the return value when the user clicks "cancel"
 	protected _additionalElements: HTMLElement | null = null;
-	protected resolve: (isOk: T | PromiseLike<T>) => void = () => { /* */ };
+	protected resolve: (isOk: T | PromiseLike<T>) => void = () => {
+		/* */
+	};
 
-	constructor(props: IPopupWindowProps)
-	{
+	constructor(props: IPopupWindowProps) {
 		this._props = props;
 		this._config = ObjectUtils.mergeConfig(PopupWindow._defaultConfig, props.config || {});
 	}
 
-	private onKeyDown = (event: KeyboardEvent) =>
-	{
-		if (!KeyboardListener.isEventTargetAnInput(event))
-		{
+	private onKeyDown = (event: KeyboardEvent) => {
+		if (!KeyboardListener.isEventTargetAnInput(event)) {
 			event.preventDefault();
 		}
 
-		switch (event.key)
-		{
+		switch (event.key) {
 			case "Enter":
 				this.onOkClick(event);
 				break;
@@ -64,43 +59,36 @@ export abstract class PopupWindow<T>
 		}
 	};
 
-	protected close()
-	{
+	protected close() {
 		PopupWindow._instances.length--;
 		window.removeEventListener("keydown", this.onKeyDown);
 		this._container.remove();
 	}
 
-	private onCancelClick = () =>
-	{
+	private onCancelClick = () => {
 		this.close();
 		this.resolve?.(this._cancelValue);
 	};
 
-	private onOkClick = (event: Event) =>
-	{
-		if (this._isOkButtonEnabled)
-		{
+	private onOkClick = (event: Event) => {
+		if (this._isOkButtonEnabled) {
 			event.stopImmediatePropagation(); // to prevent backdrop
 			this.close();
 			this.resolve?.(this._okValue);
 		}
 	};
 
-	protected enableOkButton()
-	{
+	protected enableOkButton() {
 		this._isOkButtonEnabled = true;
 		this._okButton.classList.remove("disabled");
 	}
 
-	protected disableOkButton()
-	{
+	protected disableOkButton() {
 		this._isOkButtonEnabled = false;
 		this._okButton.classList.add("disabled");
 	}
 
-	protected open()
-	{
+	protected open() {
 		window.addEventListener("keydown", this.onKeyDown);
 
 		this.draw();
@@ -111,20 +99,17 @@ export abstract class PopupWindow<T>
 				browserState: "popup",
 				id: PopupWindow._lastStateId++,
 			},
-			""
+			"",
 		);
 
-		return new Promise<T>((resolve, reject) =>
-		{
+		return new Promise<T>((resolve, reject) => {
 			this.resolve = resolve;
 		});
 	}
 
-	private draw()
-	{
+	private draw() {
 		this._container.className = "popupBackdrop flexCenter";
-		if (this._config.backdrop)
-		{
+		if (this._config.backdrop) {
 			this._container.onclick = this.onCancelClick;
 		}
 
@@ -136,16 +121,14 @@ export abstract class PopupWindow<T>
 		message.innerHTML = this._props.message;
 		popupWindow.appendChild(message);
 
-		if (this._additionalElements)
-		{
+		if (this._additionalElements) {
 			popupWindow.appendChild(this._additionalElements);
 		}
 
 		const buttonContainer = document.createElement("div");
 		buttonContainer.className = "buttonContainer hbox flexCenter";
 
-		if (this._config.cancel)
-		{
+		if (this._config.cancel) {
 			const cancelButton = document.createElement("div");
 			cancelButton.className = "cancel btn";
 			cancelButton.textContent = this._config.cancel;
@@ -157,8 +140,7 @@ export abstract class PopupWindow<T>
 		this._okButton.textContent = this._config.ok || "";
 		this._okButton.onclick = this.onOkClick;
 
-		if (!this._isOkButtonEnabled)
-		{
+		if (!this._isOkButtonEnabled) {
 			this._okButton.classList.add("disabled");
 		}
 
@@ -171,17 +153,13 @@ export abstract class PopupWindow<T>
 		this._config.parentElement?.appendChild(this._container);
 	}
 
-	public static cancelLast(): boolean
-	{
+	public static cancelLast(): boolean {
 		const length = PopupWindow._instances.length;
-		if (length > 0)
-		{
+		if (length > 0) {
 			PopupWindow._instances[length - 1].onCancelClick();
 
 			return true;
-		}
-		else
-		{
+		} else {
 			return false;
 		}
 	}

@@ -1,5 +1,4 @@
-interface ISignal<T>
-{
+interface ISignal<T> {
 	add(listener: (p1: T) => any, listenerContext?: any): void;
 	remove(listener: () => any, listenerContext?: any): boolean;
 	removeAll(): void;
@@ -8,16 +7,14 @@ interface ISignal<T>
 	bindings: IBinding<T>[];
 }
 
-interface IBinding<T>
-{
+interface IBinding<T> {
 	listener: (p1: T) => any;
 	context?: any;
 	isOnce: boolean;
 	priority: number;
 }
 
-export class Signal<T> implements ISignal<T>
-{
+export class Signal<T> implements ISignal<T> {
 	// --------------------------------------------------------------------------------------------------
 	// static create method
 
@@ -25,8 +22,7 @@ export class Signal<T> implements ISignal<T>
 	// public static create<T0, T1>()     : ISignalP2<T0, T1>;
 	// public static create<T0, T1, T2>() : ISignalP3<T0, T1, T2>;
 
-	public static create<T>(): Signal<T>
-	{
+	public static create<T>(): Signal<T> {
 		return new Signal<T>();
 	}
 
@@ -37,41 +33,29 @@ export class Signal<T> implements ISignal<T>
 
 	protected _shouldPropagate = true;
 
-	constructor()
-	{
+	constructor() {
 		this._bindings = [];
 	}
 
 	// --------------------------------------------------------------------------------------------------
 	// add methods
 
-
-	public add(listener: (p1: T) => any, context?: any, priority = 0): void
-	{
+	public add(listener: (p1: T) => any, context?: any, priority = 0): void {
 		this.registerListener(listener, false, context, priority);
 	}
 
-	protected registerListener(listener: (p1: T) => any, isOnce: boolean, context: any, priority = 0): void
-	{
+	protected registerListener(listener: (p1: T) => any, isOnce: boolean, context: any, priority = 0): void {
 		const prevIndex = this.indexOfListener(listener, context);
 		let binding: IBinding<T> | null = null;
 
-		if (prevIndex !== -1)
-		{
+		if (prevIndex !== -1) {
 			binding = this._bindings[prevIndex];
-			if (binding.isOnce !== isOnce)
-			{
+			if (binding.isOnce !== isOnce) {
 				throw new Error(
-					`You cannot add${
-						isOnce ? "" : "Once"
-					}() then add${
-						!isOnce ? "" : "Once"
-					}() the same listener without removing the relationship first.`
+					`You cannot add${isOnce ? "" : "Once"}() then add${!isOnce ? "" : "Once"}() the same listener without removing the relationship first.`,
 				);
 			}
-		}
-		else
-		{
+		} else {
 			binding = {
 				listener: listener,
 				context: context,
@@ -83,12 +67,10 @@ export class Signal<T> implements ISignal<T>
 		}
 	}
 
-	protected addBinding(binding: IBinding<T>): void
-	{
+	protected addBinding(binding: IBinding<T>): void {
 		let n = this._bindings.length;
 
-		do
-		{
+		do {
 			--n;
 		} while (this._bindings[n] && binding.priority <= this._bindings[n].priority);
 
@@ -97,14 +79,10 @@ export class Signal<T> implements ISignal<T>
 		//if (this._highestPriority < binding.pr)
 	}
 
-
-	protected indexOfListener(listener: (p1: T) => any, context: any): number
-	{
-		for (let i = this._bindings.length - 1; i >= 0; --i)
-		{
+	protected indexOfListener(listener: (p1: T) => any, context: any): number {
+		for (let i = this._bindings.length - 1; i >= 0; --i) {
 			const binding = this._bindings[i];
-			if (binding.listener === listener && binding.context === context)
-			{
+			if (binding.listener === listener && binding.context === context) {
 				return i;
 			}
 		}
@@ -112,8 +90,7 @@ export class Signal<T> implements ISignal<T>
 		return -1;
 	}
 
-	public halt(): void
-	{
+	public halt(): void {
 		this._shouldPropagate = false;
 	}
 
@@ -127,12 +104,10 @@ export class Signal<T> implements ISignal<T>
 	 * TODO return listener?
 	 */
 
-	public remove(listener: (p1: T) => any, context?: any): boolean
-	{
+	public remove(listener: (p1: T) => any, context?: any): boolean {
 		const i = this.indexOfListener(listener, context);
 
-		if (i !== -1)
-		{
+		if (i !== -1) {
 			this._bindings.splice(i, 1);
 
 			return true;
@@ -141,16 +116,14 @@ export class Signal<T> implements ISignal<T>
 		return false;
 	}
 
-	public removeAll(): void
-	{
+	public removeAll(): void {
 		this._bindings.length = 0;
 	}
 
 	// --------------------------------------------------------------------------------------------------
 	// dispatch
 
-	public dispatch(...args: any[]): void
-	{
+	public dispatch(...args: any[]): void {
 		const paramsArr = Array.prototype.slice.call(args);
 		this._shouldPropagate = true; //in case `halt` was called before dispatch or during the previous dispatch.
 
@@ -166,24 +139,20 @@ export class Signal<T> implements ISignal<T>
 		//
 		// const bindings = this._bindings.slice();
 
-		for (let i = bindings.length - 1; i >= 0; --i)
-		{
+		for (let i = bindings.length - 1; i >= 0; --i) {
 			const result = bindings[i].listener.apply(bindings[i].context, paramsArr as any);
 
-			if (result === false || !this._shouldPropagate)
-			{
+			if (result === false || !this._shouldPropagate) {
 				break;
 			}
 		}
 	}
 
-	public dispose(): void
-	{
+	public dispose(): void {
 		this.removeAll();
 	}
 
-	public get bindings(): IBinding<T>[]
-	{
+	public get bindings(): IBinding<T>[] {
 		return this._bindings;
 	}
 }

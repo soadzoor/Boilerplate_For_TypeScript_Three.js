@@ -1,12 +1,9 @@
-export class ObjectUtils
-{
-	public static mergeConfig<T extends Object>(defaultConfig: T, config: Partial<T>): T
-	{
+export class ObjectUtils {
+	public static mergeConfig<T extends Object>(defaultConfig: T, config: Partial<T>): T {
 		// Object.create makes a shallow copy
 		const resultConfig = Object.create(defaultConfig);
 
-		for (const key in config)
-		{
+		for (const key in config) {
 			const value = config[key];
 			resultConfig[key] = value;
 		}
@@ -14,13 +11,11 @@ export class ObjectUtils
 		return resultConfig;
 	}
 
-	private static keys(object: any)
-	{
+	private static keys(object: any) {
 		// NOT WORKING FOR File type!
 		// const keys = Object.keys(object);
 		const keys = [];
-		for (let key in object)
-		{
+		for (let key in object) {
 			keys.push(key);
 		}
 
@@ -33,10 +28,8 @@ export class ObjectUtils
 	 *
 	 * JSON.stringify(obj1) === JSON.stringify(obj1) is not working when there's a loop in the structure (circular structure)
 	 */
-	static compare(object1: any, object2: any): boolean
-	{
-		if (object1 === object2)
-		{
+	static compare(object1: any, object2: any): boolean {
+		if (object1 === object2) {
 			// same instance or same value for primitive types
 			// -> no need to check further
 			return true;
@@ -45,14 +38,12 @@ export class ObjectUtils
 		const type1 = typeof object1;
 		const type2 = typeof object2;
 
-		if (type1 !== type2)
-		{
+		if (type1 !== type2) {
 			// types don't match
 			return false;
 		}
 
-		if (type1 !== "object")
-		{
+		if (type1 !== "object") {
 			// they're both primitive types but don't have the same value (first if in this function)
 			return false;
 		}
@@ -66,19 +57,15 @@ export class ObjectUtils
 		const keys1 = ObjectUtils.keys(object1);
 		const keys2 = ObjectUtils.keys(object2);
 
-
-		if (keys1.length !== keys2.length)
-		{
+		if (keys1.length !== keys2.length) {
 			return false;
 		}
 
 		keys1.sort();
 		keys2.sort();
 
-		for (let i = 0, ln = keys1.length; i < ln; ++i)
-		{
-			if (keys1[i] !== keys2[i])
-			{
+		for (let i = 0, ln = keys1.length; i < ln; ++i) {
+			if (keys1[i] !== keys2[i]) {
 				// key names don't match
 				return false;
 			}
@@ -86,12 +73,10 @@ export class ObjectUtils
 
 		// they have the same keys
 		// check if they have the same values for each key
-		for (let i = 0, ln = keys1.length; i < ln; ++i)
-		{
+		for (let i = 0, ln = keys1.length; i < ln; ++i) {
 			const key = keys1[i];
 
-			if (!ObjectUtils.compare(object1[key], object2[key]))
-			{
+			if (!ObjectUtils.compare(object1[key], object2[key])) {
 				// values don't match
 				return false;
 			}

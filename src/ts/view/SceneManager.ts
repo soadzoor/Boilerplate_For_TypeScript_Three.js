@@ -8,22 +8,20 @@ import {SceneLoader} from "./SceneLoader";
 import {VignetteBackground} from "./VignetteBackground";
 import type {ISceneManager} from "./SceneManagerType";
 
-export default class SceneManager implements ISceneManager
-{
-	private _canvas: HTMLCanvasElement;
-	private _scene: Scene;
-	private _camera: PerspectiveCamera;
-	private _controls: CameraControls;
-	private _renderer: WebGLRenderer;
-	private _distance: BoundedConvergence;
+export default class SceneManager implements ISceneManager {
+	private readonly _canvas: HTMLCanvasElement;
+	private readonly _scene: Scene;
+	private readonly _camera: PerspectiveCamera;
+	private readonly _controls: CameraControls;
+	private readonly _renderer: WebGLRenderer;
+	private readonly _distance: BoundedConvergence;
 	private _normalizedCameraPosition: number[] = [0, 0, 1];
 	private _prevTimeStamp: number = 0;
 	private _timeStamp: number = 0;
 	private _deltaFrame: number = 1000;
 	public needsRender = true;
 
-	constructor()
-	{
+	constructor() {
 		this._canvas = document.getElementById("myCanvas") as HTMLCanvasElement;
 		this._scene = new Scene();
 		this._camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.05, 70);
@@ -36,12 +34,9 @@ export default class SceneManager implements ISceneManager
 			canvas: this._canvas,
 			antialias: true,
 		});
-
-		this.init();
 	}
 
-	private async init()
-	{
+	public async init() {
 		this.initBackground();
 		this.initLights();
 		this.initControls();
@@ -51,20 +46,20 @@ export default class SceneManager implements ISceneManager
 		this.animate(0);
 	}
 
-	private initBackground()
-	{
-		this._scene.add(new VignetteBackground({
-			aspect: this._camera.aspect,
-			grainScale: Constants.isIOS ? 0 : 0.001, // See mattdesl/three-vignette-background#1
-			colors: ["#ffffff", "#353535"]
-		}).mesh);
+	private initBackground() {
+		this._scene.add(
+			new VignetteBackground({
+				aspect: this._camera.aspect,
+				grainScale: Constants.isIOS ? 0 : 0.001, // See mattdesl/three-vignette-background#1
+				colors: ["#ffffff", "#353535"],
+			}).mesh,
+		);
 	}
 
-	private initLights()
-	{
-		const light1 = new AmbientLight(0xFFFFFF, 0.1);
+	private initLights() {
+		const light1 = new AmbientLight(0xffffff, 0.3);
 
-		const light2 = new DirectionalLight(0xFFFFFF, 0.1);
+		const light2 = new DirectionalLight(0xffffff, 0.8);
 		light2.position.set(0.5, 0, 0.866); // ~60ยบ
 
 		const light3 = new HemisphereLight(0xffffff, 0x080820, 0.75);
@@ -72,28 +67,24 @@ export default class SceneManager implements ISceneManager
 		this._scene.add(light1, light2, light3);
 	}
 
-	private initControls()
-	{
+	private initControls() {
 		this._controls.activate();
 	}
 
-	private async initMeshes()
-	{
-		this._scene.add(await SceneLoader.loadScene("assets/models/test.glb"));
+	private async initMeshes() {
+		this._scene.add(await SceneLoader.loadScene("src/assets/models/test.glb"));
 	}
 
-	private initRenderer()
-	{
+	private initRenderer() {
 		this._renderer.setPixelRatio(window.devicePixelRatio);
-		this._renderer.setClearColor(0xECF8FF);
+		this._renderer.setClearColor(0xecf8ff);
 
 		this._canvas.addEventListener("webglcontextlost", this.onContextLost);
 
 		window.addEventListener("resize", this.onWindowResize);
 	}
 
-	private onWindowResize = () =>
-	{
+	private onWindowResize = () => {
 		this._canvas.width = 0;
 		this._canvas.height = 0;
 
@@ -105,31 +96,27 @@ export default class SceneManager implements ISceneManager
 		this._camera.updateProjectionMatrix();
 	};
 
-	private onContextLost = async (event: Event) =>
-	{
+	private onContextLost = async (event: Event) => {
 		event.preventDefault();
 
 		await WarningWindow.open("Unfortunately WebGL has crashed. Please reload the page to continue!");
 	};
 
-	public get scene()
-	{
+	public get scene() {
 		return this._scene;
 	}
 
-	private update = (time: number) =>
-	{
+	private update = (time: number) => {
 		this._timeStamp = performance.now();
 		this._deltaFrame = this._timeStamp - this._prevTimeStamp;
 		this._prevTimeStamp = this._timeStamp;
 		this.needsRender = Convergence.updateActiveOnes(this._timeStamp) || this.needsRender;
-		if (this.needsRender)
-		{
+		if (this.needsRender) {
 			this._normalizedCameraPosition = this._controls.update();
 			this._camera.position.set(
 				this._normalizedCameraPosition[0] * this._distance.value,
 				this._normalizedCameraPosition[1] * this._distance.value,
-				this._normalizedCameraPosition[2] * this._distance.value
+				this._normalizedCameraPosition[2] * this._distance.value,
 			);
 			this._camera.lookAt(0, 0, 0);
 			this._renderer.render(this._scene, this._camera);
@@ -137,26 +124,22 @@ export default class SceneManager implements ISceneManager
 		}
 	};
 
-	private animate = (time: number) =>
-	{
+	private animate = (time: number) => {
 		this.update(time);
 		this._renderer.setAnimationLoop(this.update);
 	};
 
 	/** Returns the timestamp of the newest render run  */
-	public get timeStamp()
-	{
+	public get timeStamp() {
 		return this._timeStamp;
 	}
 
 	/** Returns the time between the last 2 frames, so we can get an idea of the user's FPS */
-	public get deltaFrame()
-	{
+	public get deltaFrame() {
 		return this._deltaFrame;
 	}
 
-	public get distance()
-	{
+	public get distance() {
 		return this._distance;
 	}
 }

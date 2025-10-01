@@ -7,14 +7,12 @@ import {MathUtils} from "./MathUtils";
  *  If you modify the "end", end you keep calling "update", then "start" will get closer and closer to the value of "end"
  *  The higher the dampingFactor is, the faster the "animation" is. It should be between 0 and 1.*/
 
-export enum Easing
-{
+export enum Easing {
 	EASE_OUT,
-	EASE_IN_OUT
+	EASE_IN_OUT,
 }
 
-export class Convergence implements IConvergence
-{
+export class Convergence implements IConvergence {
 	private static _activeInstances: Convergence[] = [];
 	private _sceneManager: ISceneManager;
 	private _timeStampAtSetEnd: number = 0;
@@ -35,8 +33,14 @@ export class Convergence implements IConvergence
 	protected _min: number = -Infinity;
 	protected _max: number = Infinity;
 
-	constructor(sceneManager: ISceneManager, start: number, end: number, easing: Easing = Easing.EASE_OUT, animationDuration: number = Constants.ANIMATION_DURATION, triggerRender: boolean = true)
-	{
+	constructor(
+		sceneManager: ISceneManager,
+		start: number,
+		end: number,
+		easing: Easing = Easing.EASE_OUT,
+		animationDuration: number = Constants.ANIMATION_DURATION,
+		triggerRender: boolean = true,
+	) {
 		this._sceneManager = sceneManager;
 		this._originalStart = start;
 		this._start = start;
@@ -48,24 +52,19 @@ export class Convergence implements IConvergence
 		this._triggerRender = triggerRender;
 	}
 
-	private static removeFromActiveOnes(convergenceToRemove: Convergence)
-	{
+	private static removeFromActiveOnes(convergenceToRemove: Convergence) {
 		Convergence._activeInstances = Convergence._activeInstances.filter((convergence: Convergence) => convergence !== convergenceToRemove);
 	}
 
-	private static addToActiveOnes(convergenceToAdd: Convergence)
-	{
-		if (!Convergence._activeInstances.includes(convergenceToAdd))
-		{
+	private static addToActiveOnes(convergenceToAdd: Convergence) {
+		if (!Convergence._activeInstances.includes(convergenceToAdd)) {
 			Convergence._activeInstances.push(convergenceToAdd);
 		}
 	}
 
-	public static updateActiveOnes(timeStamp: number)
-	{
+	public static updateActiveOnes(timeStamp: number) {
 		let triggerRender = false;
-		for (const c of Convergence._activeInstances)
-		{
+		for (const c of Convergence._activeInstances) {
 			triggerRender = triggerRender || c._triggerRender;
 			c.update(timeStamp);
 		}
@@ -73,54 +72,42 @@ export class Convergence implements IConvergence
 		return triggerRender;
 	}
 
-	private smoothStep(elapsedTime: number)
-	{
-		if (elapsedTime < this._animationDuration)
-		{
+	private smoothStep(elapsedTime: number) {
+		if (elapsedTime < this._animationDuration) {
 			const x = elapsedTime / this._animationDuration;
 
-			return MathUtils.clamp((x ** 2) * (3 - 2 * x) * (this._end - this._start) + this._start, this._min, this._max);
-		}
-		else
-		{
+			return MathUtils.clamp(x ** 2 * (3 - 2 * x) * (this._end - this._start) + this._start, this._min, this._max);
+		} else {
 			this._end = MathUtils.clamp(this._end, this._min, this._max);
 			return this._end;
 		}
 	}
 
-	private exponentialOut(elapsedTime: number)
-	{
-		if (elapsedTime < this._animationDuration)
-		{
+	private exponentialOut(elapsedTime: number) {
+		if (elapsedTime < this._animationDuration) {
 			const x = elapsedTime / this._animationDuration;
 
-			return MathUtils.clamp((1 - 2 ** (-10 * x)) * ((1024 / 1023)) * (this._end - this._start) + this._start, this._min, this._max);
-		}
-		else
-		{
+			return MathUtils.clamp((1 - 2 ** (-10 * x)) * (1024 / 1023) * (this._end - this._start) + this._start, this._min, this._max);
+		} else {
 			this._end = MathUtils.clamp(this._end, this._min, this._max);
 			return this._end;
 		}
 	}
 
 	// elapsedTime since "setEnd" called in ms
-	private getNextValue(elapsedTime: number)
-	{
+	private getNextValue(elapsedTime: number) {
 		return this._easing === Easing.EASE_IN_OUT ? this.smoothStep(elapsedTime) : this.exponentialOut(elapsedTime);
 	}
 
-	public increaseEndBy(value: number, clampBetweenMinAndMax: boolean = false)
-	{
+	public increaseEndBy(value: number, clampBetweenMinAndMax: boolean = false) {
 		this.setEnd(this._end + value, clampBetweenMinAndMax);
 	}
 
-	public decreaseEndBy(value: number, clampBetweenMinAndMax: boolean = false)
-	{
+	public decreaseEndBy(value: number, clampBetweenMinAndMax: boolean = false) {
 		this.setEnd(this._end - value, clampBetweenMinAndMax);
 	}
 
-	public setEnd(value: number, clampBetweenMinAndMax: boolean = false, animationDuration: number = this._originalAnimationDuration)
-	{
+	public setEnd(value: number, clampBetweenMinAndMax: boolean = false, animationDuration: number = this._originalAnimationDuration) {
 		this._animationDuration = animationDuration;
 		const newEnd = clampBetweenMinAndMax ? MathUtils.clamp(value, this._min, this._max) : value;
 		Convergence.addToActiveOnes(this);
@@ -128,18 +115,15 @@ export class Convergence implements IConvergence
 		this._end = newEnd;
 		this._timeStampAtSetEnd = this._sceneManager.timeStamp;
 
-		if (!clampBetweenMinAndMax)
-		{
+		if (!clampBetweenMinAndMax) {
 			clearTimeout(this._timeoutId);
-			this._timeoutId = window.setTimeout(() =>
-			{
+			this._timeoutId = window.setTimeout(() => {
 				this._end = MathUtils.clamp(this._end, this._min, this._max);
 			}, this._animationDuration);
 		}
 	}
 
-	public reset(start?: number, end?: number, animationDuration: number = this._originalAnimationDuration)
-	{
+	public reset(start?: number, end?: number, animationDuration: number = this._originalAnimationDuration) {
 		this._animationDuration = animationDuration;
 		Convergence.addToActiveOnes(this);
 		this._start = start != null ? start : this._originalStart;
@@ -147,8 +131,7 @@ export class Convergence implements IConvergence
 		this._timeStampAtSetEnd = this._sceneManager.timeStamp;
 	}
 
-	private update(timeStamp: number)
-	{
+	private update(timeStamp: number) {
 		this._prevDeltaTime = timeStamp - this._prevTimeStamp;
 		const elapsedTime = timeStamp - this._timeStampAtSetEnd;
 		const prevValue = this._value;
@@ -156,62 +139,50 @@ export class Convergence implements IConvergence
 		this._prevDeltaValue = this._value - prevValue;
 		this._prevTimeStamp = timeStamp;
 
-		if (this._value === prevValue)
-		{
+		if (this._value === prevValue) {
 			this._start = this._end;
 			this._hasChanged = false;
 			Convergence.removeFromActiveOnes(this);
-		}
-		else
-		{
+		} else {
 			this._hasChanged = true;
 		}
 	}
 
-	public get animationDuration()
-	{
+	public get animationDuration() {
 		return this._animationDuration;
 	}
 
-	public get originalAnimationDuration()
-	{
+	public get originalAnimationDuration() {
 		return this._originalAnimationDuration;
 	}
 
-	public get start()
-	{
+	public get start() {
 		return this._start;
 	}
 
-	public get value()
-	{
+	public get value() {
 		return this._value;
 	}
 
-	public get end()
-	{
+	public get end() {
 		return this._end;
 	}
 
-	public get hasChangedSinceLastTick()
-	{
+	public get hasChangedSinceLastTick() {
 		return this._hasChanged;
 	}
 
-	public get prevDeltaValue()
-	{
+	public get prevDeltaValue() {
 		return this._prevDeltaValue;
 	}
 
-	public get prevDeltaTime()
-	{
+	public get prevDeltaTime() {
 		return this._prevDeltaTime;
 	}
 
-	public get derivateAt0()
-	{
-		return this._easing === Easing.EASE_OUT ?
-			6.938247437862991 : // Equals: (5*Math.log(2) * 2**11) / 1023;
-			0; // Smoothstep's derivate is 0 at 0
+	public get derivateAt0() {
+		return this._easing === Easing.EASE_OUT
+			? 6.938247437862991 // Equals: (5*Math.log(2) * 2**11) / 1023;
+			: 0; // Smoothstep's derivate is 0 at 0
 	}
 }

@@ -1,36 +1,32 @@
 {
-  "compilerOptions": {
-    "noEmit": true,
-    "experimentalDecorators": true,
-    "moduleResolution": "node",
-    "module": "esnext",
-    "importHelpers": true,
-    "target": "es6",
-    "allowJs": false,
-    "strict": true,
-    "verbatimModuleSyntax": true,
-    "noImplicitAny": true,
-    "noImplicitOverride": true,
-    "skipLibCheck": true,
-    "types": [
-      "node"
-    ],
-    "lib": [
-      "dom",
-      "es7",
-      "scripthost",
-      "es2015.collection",
-      "es2015.core",
-      "es2015.iterable",
-      "es2015.promise",
-      "es2015.symbol",
-      "es2015.symbol.wellknown"
-    ]
-  },
-  "include": [
-    "src/ts/**/*"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+	"compilerOptions": {
+		"noEmit": true,
+		"experimentalDecorators": true,
+		"moduleResolution": "node",
+		"module": "esnext",
+		"importHelpers": true,
+		"target": "es6",
+		"allowJs": false,
+		"strict": true,
+		"verbatimModuleSyntax": true,
+		"noImplicitAny": true,
+		"noImplicitOverride": true,
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"types": ["node"],
+		"lib": [
+			"dom",
+			"es7",
+			"scripthost",
+			"es2015.collection",
+			"es2015.core",
+			"es2015.iterable",
+			"es2015.promise",
+			"es2015.symbol",
+			"es2015.symbol.wellknown"
+		]
+	},
+	"include": ["src/ts/**/*", "build/start.ts", "build/build.ts", "vite.config.ts"],
+	"exclude": ["node_modules"]
 }

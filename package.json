@@ -1,51 +1,56 @@
 {
-  "name": "3dworld",
-  "version": "0.0.1",
-  "description": "3D World",
-  "main": "",
-  "directories": {
-    "doc": "docs"
-  },
-  "type": "module",
-  "scripts": {
-    "start": "node build/start",
-    "build:dev": "node build/build",
-    "build:prod": "node build/build --prod",
-    "eslint:report": "eslint --ext .js,.jsx,.ts,.tsx src --report-unused-disable-directives --max-warnings 0 --cache",
-    "eslint:fix": "npm run eslint:report -- --fix",
-    "install git hooks": "husky install"
-  },
-  "repository": {
-    "type": "git",
-    "url": ""
-  },
-  "author": "",
-  "license": "ISC",
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "bash -c tsc -p tsconfig.json",
-      "eslint --fix"
-    ]
-  },
-  "dependencies": {
-    "three": "0.164.1"
-  },
-  "devDependencies": {
-    "@types/node": "20.12.7",
-    "@types/three": "0.163.0",
-    "@typescript-eslint/eslint-plugin": "7.7.1",
-    "esbuild": "0.20.2",
-    "eslint": "9.1.1",
-    "eslint-import-resolver-typescript": "3.6.1",
-    "eslint-plugin-import": "2.29.1",
-    "eslint-plugin-unused-imports": "3.1.0",
-    "husky": "9.0.11",
-    "lint-staged": "15.2.2",
-    "sass": "1.75.0",
-    "shx": "0.3.4",
-    "tslib": "2.6.2",
-    "typescript": "5.4.5",
-    "uglifycss": "0.0.29",
-    "vite": "5.2.10"
-  }
+	"name": "3dworld",
+	"version": "0.0.1",
+	"description": "3D World",
+	"main": "",
+	"directories": {
+		"doc": "docs"
+	},
+	"type": "module",
+	"scripts": {
+		"start-dev": "npx vite-node build/start.ts",
+		"build-dev": "npx vite-node build/build.ts",
+		"build-prod": "npx vite-node build/build.ts --prod",
+		"eslint-report": "eslint ./ --report-unused-disable-directives --max-warnings 0",
+		"eslint-fix": "npm run eslint-report -- --fix",
+		"prettier": "npx prettier . --write",
+		"sanity-check": "npm run build-dev && npm run eslint-fix && npm run prettier",
+		"install git hooks": "husky install"
+	},
+	"repository": {
+		"type": "git",
+		"url": ""
+	},
+	"author": "",
+	"license": "ISC",
+	"lint-staged": {
+		"*.{ts,tsx}": [
+			"bash -c tsc -p tsconfig.json",
+			"eslint --fix"
+		]
+	},
+	"dependencies": {
+		"three": "0.180.0"
+	},
+	"devDependencies": {
+		"@types/node": "24.6.1",
+		"@types/three": "0.180.0",
+		"@typescript-eslint/eslint-plugin": "8.45.0",
+		"esbuild": "0.25.10",
+		"esbuild-sass-plugin": "3.3.1",
+		"eslint": "9.36.0",
+		"eslint-import-resolver-typescript": "4.4.4",
+		"eslint-plugin-import": "2.32.0",
+		"eslint-plugin-sonarjs": "3.0.5",
+		"eslint-plugin-unused-imports": "4.2.0",
+		"husky": "9.1.7",
+		"lint-staged": "16.2.3",
+		"prettier": "^3.6.2",
+		"sass": "1.93.2",
+		"shx": "0.4.0",
+		"tslib": "2.8.1",
+		"typescript": "5.9.3",
+		"vite": "7.1.7",
+		"vite-tsconfig-paths": "^5.1.4"
+	}
 }

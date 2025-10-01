@@ -3,40 +3,42 @@ import {Convergence, Easing} from "./Convergence";
 import {MathUtils} from "./MathUtils";
 import {Constants} from "./Constants";
 
-export class BoundedConvergence extends Convergence
-{
+export class BoundedConvergence extends Convergence {
 	private _originalMax: number;
 	private _originalMin: number;
 
-	constructor(sceneManager: ISceneManager, start: number, end: number, min: number, max: number, easing: Easing = Easing.EASE_OUT, animationTime: number = Constants.ANIMATION_DURATION, triggerRender: boolean = true)
-	{
+	constructor(
+		sceneManager: ISceneManager,
+		start: number,
+		end: number,
+		min: number,
+		max: number,
+		easing: Easing = Easing.EASE_OUT,
+		animationTime: number = Constants.ANIMATION_DURATION,
+		triggerRender: boolean = true,
+	) {
 		super(sceneManager, start, end, easing, animationTime, triggerRender);
 		this._originalMin = this._min = min;
 		this._originalMax = this._max = max;
 	}
 
-	public get min()
-	{
+	public get min() {
 		return this._min;
 	}
 
-	public get max()
-	{
+	public get max() {
 		return this._max;
 	}
 
-	public get originalMin()
-	{
+	public get originalMin() {
 		return this._originalMin;
 	}
 
-	public get originalMax()
-	{
+	public get originalMax() {
 		return this._originalMax;
 	}
 
-	public setMin(min: number)
-	{
+	public setMin(min: number) {
 		this._min = min;
 
 		const newStart = MathUtils.clamp(this._start, this._min, this._max);
@@ -44,8 +46,7 @@ export class BoundedConvergence extends Convergence
 		super.reset(newStart, newEnd);
 	}
 
-	public setMax(max: number)
-	{
+	public setMax(max: number) {
 		this._max = max;
 
 		const newStart = MathUtils.clamp(this._start, this._min, this._max);
@@ -53,8 +54,7 @@ export class BoundedConvergence extends Convergence
 		super.reset(newStart, newEnd);
 	}
 
-	public override reset(start?: number, end?: number, min?: number, max?: number, clampBetweenMinAndMax: boolean = false)
-	{
+	public override reset(start?: number, end?: number, min?: number, max?: number, clampBetweenMinAndMax: boolean = false) {
 		this._min = min != null ? min : this._min;
 		this._max = max != null ? max : this._max;
 		const newStartCandidate = start != null ? start : this._originalStart;
@@ -64,8 +64,7 @@ export class BoundedConvergence extends Convergence
 		super.reset(newStart, newEnd);
 	}
 
-	public isPlaying()
-	{
+	public isPlaying() {
 		return this.value !== this.end;
 	}
 }

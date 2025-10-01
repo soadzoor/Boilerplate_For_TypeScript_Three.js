@@ -5,8 +5,7 @@ import {Easing} from "../utils/Convergence";
 import {VectorUtils} from "../utils/VectorUtils";
 import type {ISceneManager} from "./SceneManagerType";
 
-export class CameraControls
-{
+export class CameraControls {
 	private _domElement: HTMLElement;
 	private _isPointerDown: boolean = false;
 	private _sceneManager: ISceneManager;
@@ -15,9 +14,9 @@ export class CameraControls
 		deltaCursor: number;
 		deltaTime: number;
 	} = {
-			deltaCursor: 3,
-			deltaTime: 1000
-		};
+		deltaCursor: 3,
+		deltaTime: 1000,
+	};
 	private _pointer: {
 		downTimeStamp: number;
 		startX: number;
@@ -30,17 +29,17 @@ export class CameraControls
 		prevDeltaTime: number;
 		triggerClickOnPointerUp: boolean;
 	} = {
-			downTimeStamp: -1,
-			startX: -1,
-			startY: -1,
-			prevX: null,
-			prevY: null,
-			prevDeltaX: 0,
-			prevDeltaY: 0,
-			prevTimeStamp: 0,
-			prevDeltaTime: 1,
-			triggerClickOnPointerUp: false
-		};
+		downTimeStamp: -1,
+		startX: -1,
+		startY: -1,
+		prevX: null,
+		prevY: null,
+		prevDeltaX: 0,
+		prevDeltaY: 0,
+		prevTimeStamp: 0,
+		prevDeltaTime: 1,
+		triggerClickOnPointerUp: false,
+	};
 	private _u: BoundedConvergence;
 	private _v: BoundedConvergence;
 	private _pinch: {
@@ -53,15 +52,15 @@ export class CameraControls
 			distanceValue: number;
 		};
 	} = {
-			startValue: {
-				touchDistance: -1,
-				distanceValue: -1
-			},
-			currentValue: {
-				touchDistance: -1,
-				distanceValue: -1
-			}
-		};
+		startValue: {
+			touchDistance: -1,
+			distanceValue: -1,
+		},
+		currentValue: {
+			touchDistance: -1,
+			distanceValue: -1,
+		},
+	};
 	private _cameraNormalizedPosition: number[] = VectorUtils.normalize([-1, 0.3, 0]);
 	private _timeoutId: number = -1;
 	private _dampOnPointerUp: boolean = false;
@@ -73,11 +72,10 @@ export class CameraControls
 	private _prevSpeed: number[] = [];
 
 	public signals = {
-		click: Signal.create<{clientX: number; cientY: number}>()
+		click: Signal.create<{clientX: number; cientY: number}>(),
 	};
 
-	constructor(domElement: HTMLElement, sceneManager: ISceneManager)
-	{
+	constructor(domElement: HTMLElement, sceneManager: ISceneManager) {
 		this._domElement = domElement;
 		this._sceneManager = sceneManager;
 
@@ -90,21 +88,20 @@ export class CameraControls
 	 * @param touch0
 	 * @param touch1
 	 */
-	private getTouchDistance(event: TouchEvent)
-	{
+	private getTouchDistance(event: TouchEvent) {
 		const touch0 = {
 			x: event.touches[0].clientX,
-			y: event.touches[0].clientY
+			y: event.touches[0].clientY,
 		};
 
 		const touch1 = {
 			x: event.touches[1].clientX,
-			y: event.touches[1].clientY
+			y: event.touches[1].clientY,
 		};
 
 		const delta = {
 			x: touch1.x - touch0.x,
-			y: touch1.y - touch0.y
+			y: touch1.y - touch0.y,
 		};
 
 		const distance = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
@@ -112,8 +109,7 @@ export class CameraControls
 		return distance;
 	}
 
-	private onWheel = (event: WheelEvent) =>
-	{
+	private onWheel = (event: WheelEvent) => {
 		event.preventDefault();
 		const zoomStepSize = 1.1;
 
@@ -122,36 +118,27 @@ export class CameraControls
 		distance.setEnd(newDistanceValue, true);
 	};
 
-	private onMouseDown = (event: MouseEvent) =>
-	{
-		if (event.button === Constants.MOUSE_BUTTON.LEFT)
-		{
+	private onMouseDown = (event: MouseEvent) => {
+		if (event.button === Constants.MOUSE_BUTTON.LEFT) {
 			this.onPointerDown(event.clientX, event.clientY);
 		}
 	};
 
-	private onTouchStart = (event: TouchEvent) =>
-	{
+	private onTouchStart = (event: TouchEvent) => {
 		event.preventDefault();
 
-		if (event.touches.length === 1)
-		{
+		if (event.touches.length === 1) {
 			this.onPointerDown(event.touches[0].clientX, event.touches[0].clientY);
-		}
-		else if (event.touches.length === 2)
-		{
+		} else if (event.touches.length === 2) {
 			this._isPointerDown = false;
 			this._pinch.startValue.touchDistance = this.getTouchDistance(event);
 			this._pinch.startValue.distanceValue = this._sceneManager.distance.value;
-		}
-		else
-		{
+		} else {
 			this.onPointerUp(event);
 		}
 	};
 
-	private onPointerDown(clientX: number, clientY: number)
-	{
+	private onPointerDown(clientX: number, clientY: number) {
 		this.stopRotating();
 		this._isPointerDown = true;
 		this._mouseMoved = false;
@@ -169,53 +156,49 @@ export class CameraControls
 		this._v.reset(this._v.value, this._v.value);
 	}
 
-	private onMouseMove = (event: MouseEvent) =>
-	{
+	private onMouseMove = (event: MouseEvent) => {
 		this.onPointerMove(event.clientX, event.clientY);
 	};
 
-	private onTouchMove = (event: TouchEvent) =>
-	{
-		if (event.touches.length === 1)
-		{
+	private onTouchMove = (event: TouchEvent) => {
+		if (event.touches.length === 1) {
 			this.onPointerMove(event.touches[0].clientX, event.touches[0].clientY);
-		}
-		else if (event.touches.length === 2 && this._pinch.startValue.touchDistance)
-		{
+		} else if (event.touches.length === 2 && this._pinch.startValue.touchDistance) {
 			this._pinch.currentValue.touchDistance = this.getTouchDistance(event);
-			this._pinch.currentValue.distanceValue = (this._pinch.startValue.touchDistance / this._pinch.currentValue.touchDistance) * this._pinch.startValue.distanceValue;
+			this._pinch.currentValue.distanceValue =
+				(this._pinch.startValue.touchDistance / this._pinch.currentValue.touchDistance) * this._pinch.startValue.distanceValue;
 
 			this._sceneManager.distance.setEnd(this._pinch.currentValue.distanceValue);
-		}
-		else
-		{
+		} else {
 			this.onPointerUp(event);
 		}
 	};
 
-	private onPointerMove(clientX: number, clientY: number)
-	{
-		if (this._isPointerDown)
-		{
-			this._mouseMoved = clientX !== this._pointer.prevX || clientY !== this._pointer.prevY; /** Sometimes pointermove is fired when the mouse is clicked, but the mouse doesn't even move. We have to check if the mouse really moved, or not */
+	private onPointerMove(clientX: number, clientY: number) {
+		if (this._isPointerDown) {
+			this._mouseMoved =
+				clientX !== this._pointer.prevX ||
+				clientY !==
+					this._pointer
+						.prevY; /** Sometimes pointermove is fired when the mouse is clicked, but the mouse doesn't even move. We have to check if the mouse really moved, or not */
 
-			if (this._mouseMoved)
-			{
+			if (this._mouseMoved) {
 				this._domElement.classList.add("rotating");
 
-				if (this._pointer.prevX != null && this._pointer.prevY != null)
-				{
+				if (this._pointer.prevX != null && this._pointer.prevY != null) {
 					const distance = this._sceneManager.distance.value;
 					const pointerDeltaX = this._pointer.prevX - clientX;
 					const pointerDeltaY = clientY - this._pointer.prevY;
-					const deltaU = (pointerDeltaX * this.SENSITIVITY / window.innerHeight) * distance;
-					const deltaV = (pointerDeltaY * this.SENSITIVITY / window.innerHeight) * distance;
+					const deltaU = ((pointerDeltaX * this.SENSITIVITY) / window.innerHeight) * distance;
+					const deltaV = ((pointerDeltaY * this.SENSITIVITY) / window.innerHeight) * distance;
 
 					const currentXToStartX = this._pointer.startX - clientX;
 					const currentYToStartY = this._pointer.startY - clientY;
 
-					if (this._triggerClickThreshold.deltaCursor < Math.abs(currentXToStartX) || this._triggerClickThreshold.deltaCursor < Math.abs(currentYToStartY))
-					{
+					if (
+						this._triggerClickThreshold.deltaCursor < Math.abs(currentXToStartX) ||
+						this._triggerClickThreshold.deltaCursor < Math.abs(currentYToStartY)
+					) {
 						this._pointer.triggerClickOnPointerUp = false;
 					}
 
@@ -231,8 +214,7 @@ export class CameraControls
 
 				const timeStamp = performance.now();
 
-				if (this._triggerClickThreshold.deltaTime < (timeStamp - this._pointer.downTimeStamp))
-				{
+				if (this._triggerClickThreshold.deltaTime < timeStamp - this._pointer.downTimeStamp) {
 					this._pointer.triggerClickOnPointerUp = false;
 				}
 
@@ -246,40 +228,32 @@ export class CameraControls
 		}
 	}
 
-	private onPointerUp = (event: MouseEvent | TouchEvent) =>
-	{
-		if (this._isPointerDown)
-		{
+	private onPointerUp = (event: MouseEvent | TouchEvent) => {
+		if (this._isPointerDown) {
 			const timeStamp = performance.now();
 			this._domElement.classList.remove("rotating");
 
 			const speed = this._prevSpeed;
 			const speedAbsSq = VectorUtils.lengthOfSquared(speed);
 
-			if (this._dampOnPointerUp && !isNaN(speedAbsSq) && 0 < speedAbsSq && speedAbsSq < Infinity)
-			{
+			if (this._dampOnPointerUp && !isNaN(speedAbsSq) && 0 < speedAbsSq && speedAbsSq < Infinity) {
 				this._dampOnPointerUp = false;
 
 				const multiplicator = this._u.derivateAt0;
 
 				// s = v * t => delta
 				const time = this._u.originalAnimationDuration;
-				const delta = [
-					time * speed[0] / multiplicator,
-					time * speed[1] / multiplicator
-				];
+				const delta = [(time * speed[0]) / multiplicator, (time * speed[1]) / multiplicator];
 
 				this._u.setEnd(this._u.value + delta[0]);
 				this._v.setEnd(this._v.value + delta[1]);
 			}
 
-			if (this._triggerClickThreshold.deltaTime < (timeStamp - this._pointer.downTimeStamp))
-			{
+			if (this._triggerClickThreshold.deltaTime < timeStamp - this._pointer.downTimeStamp) {
 				this._pointer.triggerClickOnPointerUp = false;
 			}
 
-			if (this._pointer.triggerClickOnPointerUp)
-			{
+			if (this._pointer.triggerClickOnPointerUp) {
 				this.signals.click.dispatch({clientX: this._pointer.prevX, clientY: this._pointer.prevY});
 			}
 		}
@@ -296,28 +270,27 @@ export class CameraControls
 		this._pointer.prevDeltaY = 0;
 		this._pointer.prevDeltaTime = 1;
 
-		this._pinch.startValue.touchDistance = this._pinch.startValue.distanceValue =
-			this._pinch.currentValue.touchDistance = this._pinch.currentValue.distanceValue = -1;
+		this._pinch.startValue.touchDistance =
+			this._pinch.startValue.distanceValue =
+			this._pinch.currentValue.touchDistance =
+			this._pinch.currentValue.distanceValue =
+				-1;
 	};
 
-	private cancelDamping = () =>
-	{
+	private cancelDamping = () => {
 		this._dampOnPointerUp = false;
 	};
 
 	/** See this for explanation: https://en.wikipedia.org/wiki/UV_mapping#Finding_UV_on_a_sphere */
-	private setUVFromSphereSufracePoint(point: number[])
-	{
+	private setUVFromSphereSufracePoint(point: number[]) {
 		const u = Math.PI - Math.atan2(point[2], point[0]);
 		this._u.reset(u, u);
-		const v = (Math.PI / 2) - Math.asin(point[1]);
+		const v = Math.PI / 2 - Math.asin(point[1]);
 		this._v.reset(v, v);
 	}
 
-	public activate()
-	{
-		if (!this._enabled)
-		{
+	public activate() {
+		if (!this._enabled) {
 			this._enabled = true;
 			this.setUVFromSphereSufracePoint(this._cameraNormalizedPosition);
 
@@ -334,10 +307,8 @@ export class CameraControls
 		}
 	}
 
-	public deactivate()
-	{
-		if (this._enabled)
-		{
+	public deactivate() {
+		if (this._enabled) {
 			this._enabled = false;
 			this._isPointerDown = false;
 
@@ -356,8 +327,7 @@ export class CameraControls
 		}
 	}
 
-	private stopRotating()
-	{
+	private stopRotating() {
 		this._autoRotation[0] = 0;
 		this._autoRotation[1] = 0;
 
@@ -365,22 +335,26 @@ export class CameraControls
 		this._v.reset(this._v.value, this._v.value);
 	}
 
-	public update()
-	{
-		if (this._enabled)
-		{
-			if (this._autoRotation[0] !== 0)
-			{
-				this._u.reset(this._u.end + this._autoRotation[0] * this._sceneManager.deltaFrame, this._u.end + this._autoRotation[0] * this._sceneManager.deltaFrame);
+	public update() {
+		if (this._enabled) {
+			if (this._autoRotation[0] !== 0) {
+				this._u.reset(
+					this._u.end + this._autoRotation[0] * this._sceneManager.deltaFrame,
+					this._u.end + this._autoRotation[0] * this._sceneManager.deltaFrame,
+				);
 			}
 
-			if (this._autoRotation[1] !== 0)
-			{
-				this._v.reset(this._v.end + this._autoRotation[1] * this._sceneManager.deltaFrame, this._v.end + this._autoRotation[1] * this._sceneManager.deltaFrame, undefined, undefined, true);
+			if (this._autoRotation[1] !== 0) {
+				this._v.reset(
+					this._v.end + this._autoRotation[1] * this._sceneManager.deltaFrame,
+					this._v.end + this._autoRotation[1] * this._sceneManager.deltaFrame,
+					undefined,
+					undefined,
+					true,
+				);
 			}
 
-			if (this._u.hasChangedSinceLastTick || this._v.hasChangedSinceLastTick)
-			{
+			if (this._u.hasChangedSinceLastTick || this._v.hasChangedSinceLastTick) {
 				this._prevSpeed[0] = this._u.prevDeltaValue / this._u.prevDeltaTime;
 				this._prevSpeed[1] = this._v.prevDeltaValue / this._v.prevDeltaTime;
 				this._cameraNormalizedPosition = VectorUtils.getWorldPositionFromUV(this._u.value, this._v.value);

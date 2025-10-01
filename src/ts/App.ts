@@ -1,9 +1,8 @@
 import SceneManager from "./view/SceneManager";
 
-function App()
-{
+function App() {
 	const scene = new SceneManager();
+	scene.init();
 }
 
-// eslint-disable-next-line import/no-unused-modules
-export const app = App();
+App();
