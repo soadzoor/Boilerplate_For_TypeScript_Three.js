@@ -8,7 +8,7 @@ export class SceneLoader {
 
 	private static get envMap() {
 		if (!this._envMap) {
-			this._envMap = new TextureLoader().load("assets/images/environment.jpg");
+			this._envMap = new TextureLoader().load("src/assets/images/environment.jpg");
 			this._envMap.mapping = EquirectangularReflectionMapping;
 		}
 
